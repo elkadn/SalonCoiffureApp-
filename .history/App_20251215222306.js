@@ -2,12 +2,12 @@
 
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
-import RegisterScreen from './src/screens/RegisterScreen'; 
+import RegisterScreen from './src/screens/RegisterScreen'; // importer ton écran
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <RegisterScreen />  
+      <RegisterScreen />  {/* afficher l'écran d'inscription */}
       <StatusBar style="auto" />
     </View>
   );
