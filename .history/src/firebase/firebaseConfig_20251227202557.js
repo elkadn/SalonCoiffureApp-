@@ -1,0 +1,57 @@
+// import { initializeApp } from "firebase/app";
+// import { getFirestore } from "firebase/firestore";
+// import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+// import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+
+// const firebaseConfig = {
+//   apiKey: "AIzaSyC0r5HUgGVp1JyRGBcf24_a9qbokijtTRM",
+//   authDomain: "saloncoiffureapp.firebaseapp.com",
+//   projectId: "saloncoiffureapp",
+//   storageBucket: "saloncoiffureapp.firebasestorage.app",
+//   messagingSenderId: "928948250472",
+//   appId: "1:928948250472:web:cf3a2464ebcd21a4fe18dd",
+//   measurementId: "G-FFBBN3CTQE"
+// };
+
+// // Initialiser Firebase
+// const app = initializeApp(firebaseConfig);
+
+// // Initialiser Auth avec AsyncStorage
+// export const auth = initializeAuth(app, {
+//   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+// });
+
+// // Initialiser Firestore
+// export const db = getFirestore(app);
+
+// export default app;
+
+
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
+// NE PAS utiliser initializeAuth avec AsyncStorage
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC0r5HUgGVp1JyRGBcf24_a9qbokijtTRM",
+  authDomain: "saloncoiffureapp.firebaseapp.com",
+  projectId: "saloncoiffureapp",
+  storageBucket: "saloncoiffureapp.firebasestorage.app",
+  messagingSenderId: "928948250472",
+  appId: "1:928948250472:web:cf3a2464ebcd21a4fe18dd",
+  measurementId: "G-FFBBN3CTQE"
+};
+
+// Initialiser Firebase
+const app = initializeApp(firebaseConfig);
+
+// Utiliser getAuth() simple SANS persistence React Native
+export const auth = getAuth(app);
+
+// Optionnel: Désactiver explicitement la persistence
+// setPersistence(auth, browserLocalPersistence); // Ou browserSessionPersistence
+
+// Initialiser Firestore
+export const db = getFirestore(app);
+
+export default app;
