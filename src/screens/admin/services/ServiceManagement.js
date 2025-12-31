@@ -10,56 +10,28 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
-const ProductManagement = ({ navigation }) => {
+const serviceManagement = ({ navigation }) => {
   const menuItems = [
     {
-      title: "Gestion des Catégories",
-      description: "Ajouter, modifier, supprimer des catégories",
-      screen: "CategoryList",
-      icon: "category",
+      title: "Gestion des services",
+      description: "Ajouter, modifier, supprimer des services",
+      screen: "ServiceList",
+      icon: "spa",
       color: "#4CAF50",
     },
     {
-      title: "Gestion des Produits",
-      description: "Voir, ajouter et gérer les produits",
-      screen: "ProductList",
-      icon: "inventory",
-      color: "#2196F3",
-    },
-    {
-      title: "Gestion des Fournisseurs",
-      description: "Gérer les fournisseurs de produits",
-      screen: "SupplierList",
-      icon: "local-shipping",
+      title: "Gestion des avis",
+      description: "Gérer les avis clients",
+      screen: "ReviewManagement", 
+      icon: "rate-review",
       color: "#FF9800",
     },
     {
-      title: "Ajouter un Produit",
-      description: "Créer un nouveau produit",
-      screen: "ProductForm",
+      title: "Ajouter un service",
+      description: "Créer un nouveau serivice",
+      screen: "ServiceForm",
       icon: "add-circle",
       color: "#9C27B0",
-    },
-    {
-      title: "Gestion des Commandes",
-      description: "Créer et suivre les commandes fournisseurs",
-      screen: "OrderList", // Nouvel écran
-      icon: "shopping-cart",
-      color: "#FF5722",
-    },
-    {
-      title: "Nouvelle Commande",
-      description: "Créer une nouvelle commande fournisseur",
-      screen: "OrderForm", // Nouvel écran
-      icon: "add-shopping-cart",
-      color: "#795548",
-    },
-    {
-      title: "Stocks & Inventaire",
-      description: "Suivi des niveaux de stock",
-      screen: "InventoryScreen",
-      icon: "assessment",
-      color: "#E91E63",
     },
   ];
 
@@ -69,23 +41,23 @@ const ProductManagement = ({ navigation }) => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
-        >
-          <Icon name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Gestion des Produits</Text>
+        ></TouchableOpacity>
+        <Text style={styles.headerTitle}>Gestion des services</Text>
         <View style={styles.placeholder} />
       </View>
 
       <ScrollView style={styles.content}>
         <Text style={styles.sectionTitle}>Options de Gestion</Text>
-        
+
         {menuItems.map((item, index) => (
           <TouchableOpacity
             key={index}
             style={styles.menuCard}
             onPress={() => navigation.navigate(item.screen)}
           >
-            <View style={[styles.iconContainer, { backgroundColor: item.color }]}>
+            <View
+              style={[styles.iconContainer, { backgroundColor: item.color }]}
+            >
               <Icon name={item.icon} size={24} color="#fff" />
             </View>
             <View style={styles.menuContent}>
@@ -109,12 +81,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingTop: 40,
     paddingBottom: 20,
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
-    paddingHorizontal: 20,
   },
   backButton: {
     padding: 5,
@@ -173,4 +142,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductManagement;
+export default serviceManagement;

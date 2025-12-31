@@ -1,4 +1,4 @@
-// screens/admin/ProductManagement.js
+// screens/admin/RendezvousManagement.js
 import React from "react";
 import {
   View,
@@ -10,82 +10,50 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
-const ProductManagement = ({ navigation }) => {
+const AppointmentManagement = ({ navigation }) => {
   const menuItems = [
     {
-      title: "Gestion des Catégories",
-      description: "Ajouter, modifier, supprimer des catégories",
-      screen: "CategoryList",
-      icon: "category",
+      title: "Liste des Rendez-vous",
+      description: "Voir et gérer tous les rendez-vous du salon",
+      screen: "AppointmentList",
+      icon: "event",
       color: "#4CAF50",
     },
     {
-      title: "Gestion des Produits",
-      description: "Voir, ajouter et gérer les produits",
-      screen: "ProductList",
-      icon: "inventory",
+      title: "Gestion des visites",
+      description:
+        "Marquer les rendez-vous comme effectués et gérer les visites",
+      screen: "VisitManagement",
+      icon: "check-circle",
       color: "#2196F3",
     },
     {
-      title: "Gestion des Fournisseurs",
-      description: "Gérer les fournisseurs de produits",
-      screen: "SupplierList",
-      icon: "local-shipping",
+      title: "Statistiques",
+      description: "Voir les statistiques des rendez-vous et revenus",
+      screen: "AppointmentStats",
+      icon: "bar-chart",
       color: "#FF9800",
-    },
-    {
-      title: "Ajouter un Produit",
-      description: "Créer un nouveau produit",
-      screen: "ProductForm",
-      icon: "add-circle",
-      color: "#9C27B0",
-    },
-    {
-      title: "Gestion des Commandes",
-      description: "Créer et suivre les commandes fournisseurs",
-      screen: "OrderList", // Nouvel écran
-      icon: "shopping-cart",
-      color: "#FF5722",
-    },
-    {
-      title: "Nouvelle Commande",
-      description: "Créer une nouvelle commande fournisseur",
-      screen: "OrderForm", // Nouvel écran
-      icon: "add-shopping-cart",
-      color: "#795548",
-    },
-    {
-      title: "Stocks & Inventaire",
-      description: "Suivi des niveaux de stock",
-      screen: "InventoryScreen",
-      icon: "assessment",
-      color: "#E91E63",
     },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Icon name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Gestion des Produits</Text>
-        <View style={styles.placeholder} />
+        <Text style={styles.headerTitle}>Gestion des Rendez-vous</Text>
       </View>
 
       <ScrollView style={styles.content}>
         <Text style={styles.sectionTitle}>Options de Gestion</Text>
-        
+
         {menuItems.map((item, index) => (
           <TouchableOpacity
             key={index}
             style={styles.menuCard}
             onPress={() => navigation.navigate(item.screen)}
           >
-            <View style={[styles.iconContainer, { backgroundColor: item.color }]}>
+            <View
+              style={[styles.iconContainer, { backgroundColor: item.color }]}
+            >
               <Icon name={item.icon} size={24} color="#fff" />
             </View>
             <View style={styles.menuContent}>
@@ -109,23 +77,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingTop: 40,
     paddingBottom: 20,
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
-    paddingHorizontal: 20,
-  },
-  backButton: {
-    padding: 5,
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#333",
-  },
-  placeholder: {
-    width: 34,
   },
   content: {
     flex: 1,
@@ -173,4 +132,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductManagement;
+export default AppointmentManagement;

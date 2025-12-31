@@ -63,16 +63,9 @@ const DashboardScreen = ({ navigation }) => {
     {
       title: "📅 Gestion des Rendez-vous",
       description: "Voir et gérer les réservations",
-      screen: "Reservations",
+      screen: "AppointmentManagement",
       icon: "📅",
       color: "#FF9800",
-    },
-    {
-      title: "💰 Statistiques Financières",
-      description: "Suivi des revenus et performances",
-      screen: "Stats",
-      icon: "💰",
-      color: "#9C27B0",
     },
     {
       title: "🏢 Paramètres du Salon",
@@ -81,19 +74,23 @@ const DashboardScreen = ({ navigation }) => {
       icon: "🏢",
       color: "#607D8B",
     },
-
+    {
+      title: "✂️ Gestion des Services",
+      description: "Ajouter, modifier, supprimer les services",
+      screen: "ServiceManagement",
+      icon: "✂️",
+      color: "#FF5722",
+    },
   ];
 
   return (
     <View style={styles.container}>
-    
       <ScrollView
         style={styles.content}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Statistiques */}
         <Text style={styles.sectionTitle}>Aperçu du Salon</Text>
 
         {stats && (
@@ -102,17 +99,6 @@ const DashboardScreen = ({ navigation }) => {
               <View style={[styles.statCard, { backgroundColor: "#4CAF50" }]}>
                 <Text style={styles.statNumber}>{stats.totalUsers}</Text>
                 <Text style={styles.statLabel}>Utilisateurs</Text>
-              </View>
-              <View style={[styles.statCard, { backgroundColor: "#2196F3" }]}>
-                <Text style={styles.statNumber}>{stats.activeUsers}</Text>
-                <Text style={styles.statLabel}>Actifs</Text>
-              </View>
-            </View>
-
-            <View style={styles.statRow}>
-              <View style={[styles.statCard, { backgroundColor: "#FF9800" }]}>
-                <Text style={styles.statNumber}>{stats.coiffeurs}</Text>
-                <Text style={styles.statLabel}>Coiffeurs</Text>
               </View>
               <View style={[styles.statCard, { backgroundColor: "#9C27B0" }]}>
                 <Text style={styles.statNumber}>{stats.clients}</Text>
@@ -141,9 +127,8 @@ const DashboardScreen = ({ navigation }) => {
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
         ))}
+        <View style={{ height: 10 }}></View>
       </ScrollView>
-
-     
     </View>
   );
 };
@@ -153,6 +138,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     flex: 1,
     backgroundColor: "#f5f5f5",
+    marginBottom: 80,
   },
 
   content: {
@@ -166,9 +152,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     marginTop: 10,
   },
-  statsContainer: {
-    marginBottom: 25,
-  },
+
   statRow: {
     flexDirection: "row",
     justifyContent: "space-between",

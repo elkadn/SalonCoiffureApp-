@@ -33,23 +33,35 @@ import SupplierForm from "../screens/admin/produits/fournisseurs/SupplierForm";
 import ProductList from "../screens/admin/produits/produits/ProductList";
 import ProductForm from "../screens/admin/produits/produits/ProductForm";
 import InventoryScreen from "../screens/admin/produits/produits/InventoryScreen";
-// import RegisterScreen from "../screens/auth/RegisterScreen";
-// import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
 import { LayoutWrapper } from "../components/LayoutWrapper";
 import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
 import RegisterScreen from "../screens/auth/RegisterScreen";
 import SalonSettingsScreen from "../screens/admin/settings/SalonSettingsScreen";
-import { salonService } from '../services/salonService';
-
+import { salonService } from "../services/salonService";
+import ServiceFormScreen from "../screens/admin/services/ServiceFormScreen";
+import ServiceListScreen from "../screens/admin/services/ServiceListScreen";
+import ServicesScreen from "../screens/client/services/ServicesScreen";
+import ServiceDetailsScreen from "../screens/client/services/ServiceDetailsScreen";
+import serviceManagement from "../screens/admin/services/ServiceManagement";
+import ReviewManagementScreen from "../screens/admin/services/ReviewManagementScreen";
+import AppointmentsScreen from "../screens/client/rendezvous/AppointmentsScreen";
+import RendezvousManagement from "../screens/admin/rendezvous/AppointmentManagement";
+import AppointmentManagement from "../screens/admin/rendezvous/AppointmentManagement";
+import AppointmentList from "../screens/admin/rendezvous/AppointmentList";
+import VisitManagement from "../screens/admin/rendezvous/VisitManagement";
+import AppointmentStats from "../screens/admin/rendezvous/AppointmentStats";
+import MyReviewsScreen from "../screens/client/services/MyReviewsScreen";
+import UserProfileScreen from "../screens/UserProfileScreen";
+import OrderList from "../screens/admin/commandes/OrderList";
+import OrderForm from "../screens/admin/commandes/OrderForm";
+import OrderDetail from "../screens/admin/commandes/OrderDetail";
+import StylistAppointments from "../screens/styliste/StylistAppointments";
+import AppointmentDetail from "../screens/styliste/AppointmentDetail";
+import PromotionsScreen from "../screens/PromotionsScreen";
 
 const Stack = createNativeStackNavigator();
 
-
-export const CustomDrawer = ({
-  navigation,
-  drawerVisible,
-  closeDrawer,
-}) => {
+export const CustomDrawer = ({ navigation, drawerVisible, closeDrawer }) => {
   const { currentUser, userData, logout } = useAuth();
   const [salonInfo, setSalonInfo] = useState(null);
   const [logoUri, setLogoUri] = useState(null);
@@ -62,18 +74,41 @@ export const CustomDrawer = ({
     try {
       const info = await salonService.getSalonInfo();
       setSalonInfo(info);
-      
+
       if (info.logoPath) {
         const logo = await salonService.loadSalonLogo();
         if (logo) setLogoUri(logo);
       }
     } catch (error) {
-      console.error('Erreur chargement info salon:', error);
+      console.error("Erreur chargement info salon:", error);
     }
   };
 
+  // Modifiez la const menuItems dans CustomDrawer :
+
   const menuItems = [
     { label: "Accueil", screen: "Home", icon: "🏠" },
+    ...(currentUser
+      ? [
+          { label: "Mon Profil", screen: "UserProfile", icon: "👤" },
+          ...(userData?.role === "styliste"
+            ? [
+                {
+                  label: "Mes Rendez-vous",
+                  screen: "StylistAppointments",
+                  icon: "📅",
+                },
+              ]
+            : [
+                {
+                  label: "Mes rendez-vous",
+                  screen: "Appointments",
+                  icon: "📅",
+                },
+              ]),
+          { label: "Services", screen: "Services", icon: "💇" },
+        ]
+      : []),
     ...(!currentUser
       ? [{ label: "Connexion", screen: "Login", icon: "🔐" }]
       : []),
@@ -81,8 +116,21 @@ export const CustomDrawer = ({
       ? [
           { label: "Tableau de bord", screen: "Dashboard", icon: "📊" },
           { label: "Gestion Utilisateurs", screen: "UserList", icon: "👥" },
-          { label: "Gestion Coiffeurs", screen: "CoiffeurManagement", icon: "💇" },
-          { label: "Gestion Produits", screen: "ProductManagement", icon: "📦" },
+          {
+            label: "Gestion Coiffeurs",
+            screen: "CoiffeurManagement",
+            icon: "💇",
+          },
+          {
+            label: "Gestion Produits",
+            screen: "ProductManagement",
+            icon: "📦",
+          },
+          {
+            label: "Gestion Services",
+            screen: "ServiceManagement",
+            icon: "💈",
+          },
           { label: "Paramètres du Salon", screen: "SalonSettings", icon: "⚙️" },
         ]
       : []),
@@ -118,15 +166,15 @@ export const CustomDrawer = ({
     if (logoUri) {
       return (
         <Image
-          source={{ uri: logoUri }} 
-          style={styles.headerLogo} 
+          source={{ uri: logoUri }}
+          style={styles.headerLogo}
           resizeMode="contain"
         />
       );
     }
     return (
       <Text style={styles.headerTitle}>
-        {salonInfo?.nom || 'Salon de Coiffure'}
+        {salonInfo?.nom || "Salon de Coiffure"}
       </Text>
     );
   };
@@ -152,19 +200,17 @@ export const CustomDrawer = ({
               </TouchableOpacity>
             </View>
 
-           
-
             {currentUser && userData ? (
               <View style={styles.userInfo}>
                 <Text style={styles.userName}>
-                  {userData.prenom && userData.nom 
+                  {userData.prenom && userData.nom
                     ? `${userData.prenom} ${userData.nom}`
                     : userData.email || currentUser.email}
                 </Text>
                 <Text style={styles.userRole}>
                   {userData.role === "admin"
                     ? "Administrateur"
-                    : userData.role === "stylist"
+                    : userData.role === "styliste"
                     ? "Styliste"
                     : "Client"}
                 </Text>
@@ -180,25 +226,30 @@ export const CustomDrawer = ({
                 key={index}
                 style={[
                   styles.menuItem,
-                  item.label === "Paramètres du Salon" && styles.adminMenuItem
+                  item.label === "Paramètres du Salon" && styles.adminMenuItem,
                 ]}
                 onPress={() => handleMenuItemPress(item)}
               >
                 <Text style={styles.menuIcon}>{item.icon}</Text>
-                <Text style={[
-                  styles.menuLabel,
-                  item.label === "Paramètres du Salon" && styles.adminMenuLabel
-                ]}>
+                <Text
+                  style={[
+                    styles.menuLabel,
+                    item.label === "Paramètres du Salon" &&
+                      styles.adminMenuLabel,
+                  ]}
+                >
                   {item.label}
                 </Text>
               </TouchableOpacity>
             ))}
-            
+
             {/* Informations de contact en bas */}
             {(salonInfo?.telephone || salonInfo?.adresse) && (
               <View style={styles.footerInfo}>
                 {salonInfo.telephone && (
-                  <Text style={styles.footerText}>📞 {salonInfo.telephone}</Text>
+                  <Text style={styles.footerText}>
+                    📞 {salonInfo.telephone}
+                  </Text>
                 )}
                 {salonInfo.email && (
                   <Text style={styles.footerText}>📧 {salonInfo.email}</Text>
@@ -221,8 +272,6 @@ export const CustomDrawer = ({
     </Modal>
   );
 };
-
-
 
 export const withDrawer = (Component, options = {}) => {
   return (props) => (
@@ -253,7 +302,6 @@ const DrawerNavigator = () => {
           return <HomeWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       {/* Login avec drawer */}
       <Stack.Screen name="Login">
         {(props) => {
@@ -261,7 +309,6 @@ const DrawerNavigator = () => {
           return <LoginWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       {/* Register avec drawer */}
       <Stack.Screen name="Register">
         {(props) => {
@@ -269,7 +316,6 @@ const DrawerNavigator = () => {
           return <RegisterWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="ForgotPassword">
         {(props) => {
           const ForgotPasswordScreenWithDrawer =
@@ -277,7 +323,6 @@ const DrawerNavigator = () => {
           return <ForgotPasswordScreenWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="SalonSettings">
         {(props) => {
           const SalonSettingsWithDrawer = withDrawer(SalonSettingsScreen, {
@@ -294,7 +339,6 @@ const DrawerNavigator = () => {
           return <DashboardWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       {/* Tous les autres écrans admin avec drawer */}
       <Stack.Screen name="UserList">
         {(props) => {
@@ -302,35 +346,30 @@ const DrawerNavigator = () => {
           return <UserListWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="UserForm">
         {(props) => {
           const UserFormWithDrawer = withDrawer(UserFormScreen);
           return <UserFormWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="UserDetail">
         {(props) => {
           const UserDetailWithDrawer = withDrawer(UserDetailScreen);
           return <UserDetailWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="CoiffeurManagement">
         {(props) => {
           const CoiffeurManagementWithDrawer = withDrawer(CoiffeurManagement);
           return <CoiffeurManagementWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="ProductManagement">
         {(props) => {
           const ProductManagementWithDrawer = withDrawer(ProductManagement);
           return <ProductManagementWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       {/* Ajoutez tous vos autres écrans de la même manière */}
       <Stack.Screen name="StylisteCreneaux">
         {(props) => {
@@ -338,88 +377,204 @@ const DrawerNavigator = () => {
           return <StylisteCreneauxWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="ProfilCapillaire">
         {(props) => {
           const ProfilCapillaireWithDrawer = withDrawer(ProfilCapillaireScreen);
           return <ProfilCapillaireWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="SpecialiteList">
         {(props) => {
           const SpecialiteListWithDrawer = withDrawer(SpecialiteList);
           return <SpecialiteListWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="SpecialiteForm">
         {(props) => {
           const SpecialiteFormWithDrawer = withDrawer(SpecialiteForm);
           return <SpecialiteFormWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="AffectSpecialites">
         {(props) => {
           const AffectSpecialitesWithDrawer = withDrawer(AffectSpecialites);
           return <AffectSpecialitesWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="StylisteList">
         {(props) => {
           const StylisteListWithDrawer = withDrawer(StylisteList);
           return <StylisteListWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="CategoryList">
         {(props) => {
           const CategoryListWithDrawer = withDrawer(CategoryList);
           return <CategoryListWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="CategoryForm">
         {(props) => {
           const CategoryFormWithDrawer = withDrawer(CategoryForm);
           return <CategoryFormWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="SupplierList">
         {(props) => {
           const SupplierListWithDrawer = withDrawer(SupplierList);
           return <SupplierListWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="SupplierForm">
         {(props) => {
           const SupplierFormWithDrawer = withDrawer(SupplierForm);
           return <SupplierFormWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="ProductList">
         {(props) => {
           const ProductListWithDrawer = withDrawer(ProductList);
           return <ProductListWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="ProductForm">
         {(props) => {
           const ProductFormWithDrawer = withDrawer(ProductForm);
           return <ProductFormWithDrawer {...props} />;
         }}
       </Stack.Screen>
-
       <Stack.Screen name="InventoryScreen">
         {(props) => {
           const InventoryScreenWithDrawer = withDrawer(InventoryScreen);
           return <InventoryScreenWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="ServiceManagement">
+        {(props) => {
+          const ServiceManagementWithDrawer = withDrawer(serviceManagement);
+          return <ServiceManagementWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="ServiceList">
+        {(props) => {
+          const ServiceListWithDrawer = withDrawer(ServiceListScreen);
+          return <ServiceListWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="ServiceForm">
+        {(props) => {
+          const ServiceFormWithDrawer = withDrawer(ServiceFormScreen);
+          return <ServiceFormWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="Services">
+        {(props) => {
+          const ServicesWithDrawer = withDrawer(ServicesScreen);
+          return <ServicesWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="ServiceDetails">
+        {(props) => {
+          const ServiceDetailsWithDrawer = withDrawer(ServiceDetailsScreen);
+          return <ServiceDetailsWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="ReviewManagement">
+        {(props) => {
+          const ReviewManagementWithDrawer = withDrawer(ReviewManagementScreen);
+          return <ReviewManagementWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="Appointments">
+        {(props) => {
+          const AppointmentsWithDrawer = withDrawer(AppointmentsScreen);
+          return <AppointmentsWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+
+      <Stack.Screen name="AppointmentManagement">
+        {(props) => {
+          const AppointmentManagementWithDrawer = withDrawer(
+            AppointmentManagement
+          );
+          return <AppointmentManagementWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="AppointmentList">
+        {(props) => {
+          const AppointmentListWithDrawer = withDrawer(AppointmentList);
+          return <AppointmentListWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="VisitManagement">
+        {(props) => {
+          const VisitManagementWithDrawer = withDrawer(VisitManagement);
+          return <VisitManagementWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="AppointmentStats">
+        {(props) => {
+          const AppointmentStatsWithDrawer = withDrawer(AppointmentStats);
+          return <AppointmentStatsWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+
+      <Stack.Screen name="MyReviews">
+        {(props) => {
+          const MyReviewsWithDrawer = withDrawer(MyReviewsScreen);
+          return <MyReviewsWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+
+      <Stack.Screen name="UserProfile">
+        {(props) => {
+          const UserProfileWithDrawer = withDrawer(UserProfileScreen);
+          return <UserProfileWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+
+      <Stack.Screen name="OrderList">
+        {(props) => {
+          const OrderListWithDrawer = withDrawer(OrderList);
+          return <OrderListWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+
+      <Stack.Screen name="OrderForm">
+        {(props) => {
+          const OrderFormWithDrawer = withDrawer(OrderForm);
+          return <OrderFormWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+
+      <Stack.Screen name="OrderDetail">
+        {(props) => {
+          const OrderDetailWithDrawer = withDrawer(OrderDetail);
+          return <OrderDetailWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="OrderEdit">
+        {(props) => {
+          const OrderEditWithDrawer = withDrawer(OrderForm);
+          return <OrderEditWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="StylistAppointments">
+        {(props) => {
+          const StylistAppointmentsWithDrawer = withDrawer(StylistAppointments);
+          return <StylistAppointmentsWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+       <Stack.Screen name="AppointmentDetail">
+        {(props) => {
+          const AppointmentDetailWithDrawer = withDrawer(AppointmentDetail);
+          return <AppointmentDetailWithDrawer {...props} />;
+        }}
+      </Stack.Screen>
+      <Stack.Screen name="Promotions">
+        {(props) => {
+          const PromotionsScreenWithDrawer = withDrawer(PromotionsScreen);
+          return <PromotionsScreenWithDrawer {...props} />;
         }}
       </Stack.Screen>
     </Stack.Navigator>
@@ -521,36 +676,36 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: "#eee",
   },
   salonPhone: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#4CAF50',
+    fontWeight: "600",
+    color: "#4CAF50",
   },
   salonEmail: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginTop: 2,
   },
   adminMenuItem: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
     borderLeftWidth: 3,
-    borderLeftColor: '#4CAF50',
+    borderLeftColor: "#4CAF50",
   },
   adminMenuLabel: {
-    fontWeight: '600',
+    fontWeight: "600",
   },
   footerInfo: {
     padding: 20,
     paddingTop: 30,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
-    backgroundColor: '#f9f9f9',
+    borderTopColor: "#eee",
+    backgroundColor: "#f9f9f9",
   },
   footerText: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginBottom: 5,
   },
 });
