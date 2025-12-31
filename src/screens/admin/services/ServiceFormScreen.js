@@ -15,11 +15,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { serviceService } from "../../../services/serviceService";
 import { productService } from "../../../services/productService";
-import {
-  saveProductImage,
-  pickImage,
-  deleteProductImage,
-} from "../../../services/localImageService";
+import { pickImage, uploadToCloudinary } from "../../../services/cloudinaryService";
 
 const ServiceFormScreen = ({ route, navigation }) => {
   const { serviceId } = route.params || {};
@@ -244,14 +240,13 @@ const ServiceFormScreen = ({ route, navigation }) => {
       if (imageUri) {
         setFormData((prev) => ({
           ...prev,
-          images: [...prev.images, imageUri],
+          images: [...prev.images, imageUri], // URI temporaire locale
         }));
       }
     } catch (error) {
       Alert.alert("Erreur", error.message);
     }
   };
-
   const handleRemoveImage = (index) => {
     const newImages = [...formData.images];
     newImages.splice(index, 1);
@@ -348,24 +343,37 @@ const ServiceFormScreen = ({ route, navigation }) => {
     try {
       setSaving(true);
 
-      // Sauvegarder les images localement
-      const imagesPaths = [];
+      // Sauvegarder les images sur Cloudinary
+      // Actuellement vous avez probablement ceci (ligne ~430-445) :
+      const imagesCloudinary = [];
       for (const imageUri of formData.images) {
         try {
-          const savedPath = await saveProductImage(
-            imageUri,
-            `service_${serviceId || "new"}`
-          );
-          imagesPaths.push(savedPath);
+          // Vérifier si c'est déjà une URL Cloudinary ou une URI locale
+          if (imageUri.includes("cloudinary.com")) {
+            // C'est déjà une URL Cloudinary (en mode édition)
+            imagesCloudinary.push(imageUri);
+          } else {
+            // Upload vers Cloudinary
+            console.log("📤 Upload image service vers Cloudinary...");
+            const cloudinaryResult = await uploadToCloudinary(
+              imageUri,
+              "service_images"
+            );
+            imagesCloudinary.push(cloudinaryResult.url);
+          }
         } catch (error) {
-          console.error("Erreur sauvegarde image:", error);
-          imagesPaths.push(imageUri); // Garder l'URI original en cas d'erreur
+          console.error("Erreur upload image:", error);
+          Alert.alert(
+            "Attention",
+            `Une image n'a pas pu être uploadée: ${error.message}`
+          );
+          // Continuer avec les autres images
         }
       }
 
       const serviceToSave = {
         ...formData,
-        images: imagesPaths,
+        images: imagesCloudinary, 
         prix: parseFloat(formData.prix),
         duree: parseInt(formData.duree),
       };

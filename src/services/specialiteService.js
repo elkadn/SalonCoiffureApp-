@@ -1,18 +1,18 @@
 // services/specialiteService.js
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc, 
-  deleteDoc, 
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
   getDocs,
   query,
   where,
   orderBy,
-  serverTimestamp 
-} from 'firebase/firestore';
-import { db } from '../firebase/firebaseConfig';
+  serverTimestamp,
+} from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 const COLLECTION_NAME = "specialites";
 
@@ -22,10 +22,10 @@ export const getAllSpecialites = async () => {
     const specialitesCollection = collection(db, COLLECTION_NAME);
     const q = query(specialitesCollection, orderBy("nom"));
     const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => ({
+
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Erreur récupération spécialités:", error);
@@ -37,11 +37,11 @@ export const getAllSpecialites = async () => {
 export const getSpecialiteById = async (specialiteId) => {
   try {
     const specialiteDoc = await getDoc(doc(db, COLLECTION_NAME, specialiteId));
-    
+
     if (specialiteDoc.exists()) {
       return {
         id: specialiteDoc.id,
-        ...specialiteDoc.data()
+        ...specialiteDoc.data(),
       };
     }
     return null;
@@ -68,28 +68,28 @@ export const createSpecialite = async (specialiteData) => {
       dateCreation: serverTimestamp(),
       dateModification: serverTimestamp(),
       actif: true,
-      nombreCoiffeurs: 0 // Initialiser à 0
+      nombreCoiffeurs: 0, // Initialiser à 0
     };
 
     // Créer une référence de document avec ID auto-généré
     const newDocRef = doc(collection(db, COLLECTION_NAME));
-    
+
     // Sauvegarder dans Firestore
     await setDoc(newDocRef, specialiteDoc);
-    
+
     console.log("Spécialité créée avec ID :", newDocRef.id);
     return {
       id: newDocRef.id,
-      ...specialiteDoc
+      ...specialiteDoc,
     };
   } catch (error) {
     console.error("Erreur création spécialité :", error);
-    
+
     // Gérer les erreurs spécifiques
     if (error.message.includes("existe déjà")) {
       throw new Error(error.message);
     }
-    
+
     throw new Error("Erreur lors de la création de la spécialité");
   }
 };
@@ -106,23 +106,23 @@ export const updateSpecialite = async (specialiteId, specialiteData) => {
     const dataToUpdate = {
       nom: specialiteData.nom.trim(),
       description: specialiteData.description?.trim() || "",
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     };
 
     await updateDoc(doc(db, COLLECTION_NAME, specialiteId), dataToUpdate);
-    
+
     console.log("Spécialité mise à jour :", specialiteId);
-    
+
     // Retourner les données mises à jour
     return await getSpecialiteById(specialiteId);
   } catch (error) {
     console.error("Erreur mise à jour spécialité:", error);
-    
+
     // Gérer les erreurs spécifiques
     if (error.message.includes("existe déjà")) {
       throw new Error(error.message);
     }
-    
+
     throw new Error("Erreur lors de la mise à jour de la spécialité");
   }
 };
@@ -133,12 +133,12 @@ export const deleteSpecialite = async (specialiteId) => {
     // Option 1: Marquer comme inactif (soft delete)
     await updateDoc(doc(db, COLLECTION_NAME, specialiteId), {
       actif: false,
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     });
-    
+
     // Option 2: Supprimer définitivement (décommenter si nécessaire)
     // await deleteDoc(doc(db, COLLECTION_NAME, specialiteId));
-    
+
     console.log("Spécialité désactivée :", specialiteId);
     return specialiteId;
   } catch (error) {
@@ -148,36 +148,32 @@ export const deleteSpecialite = async (specialiteId) => {
 };
 
 // Vérifier si le nom est unique
+// Modifier la fonction checkUniqueName pour mieux filtrer :
 export const checkUniqueName = async (nom, excludeId = null) => {
   try {
     const specialitesCollection = collection(db, COLLECTION_NAME);
-    const nomLower = nom.trim().toLowerCase();
-    
-    // Construire la requête
-    let q = query(
-      specialitesCollection,
-      where("nom", ">=", nomLower),
-      where("nom", "<=", nomLower + "\uf8ff")
-    );
-    
+
+    // Récupérer TOUTES les spécialités actives
+    const q = query(specialitesCollection, where("actif", "==", true));
+
     const snapshot = await getDocs(q);
-    
-    // Vérifier les résultats
+    const nomLower = nom.trim().toLowerCase();
+
+    // Filtrer localement pour une meilleure précision
     const existingSpecialites = snapshot.docs
-      .filter(doc => {
-        // Exclure la spécialité actuelle si on est en mode édition
-        if (excludeId) {
-          return doc.id !== excludeId;
+      .filter((doc) => {
+        // Exclure la spécialité actuelle en mode édition
+        if (excludeId && doc.id === excludeId) {
+          return false;
         }
         return true;
       })
-      .filter(doc => {
+      .filter((doc) => {
         const data = doc.data();
-        // Vérifier si actif et nom similaire (insensible à la casse)
-        return data.actif !== false && 
-               data.nom.toLowerCase() === nomLower;
+        // Comparaison insensible à la casse
+        return data.nom && data.nom.toLowerCase() === nomLower;
       });
-    
+
     return existingSpecialites.length === 0;
   } catch (error) {
     console.error("Erreur vérification nom unique:", error);
@@ -189,10 +185,11 @@ export const checkUniqueName = async (nom, excludeId = null) => {
 export const searchSpecialites = async (searchTerm) => {
   try {
     const allSpecialites = await getAllSpecialites();
-    
-    return allSpecialites.filter(specialite => 
-      specialite.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      specialite.description?.toLowerCase().includes(searchTerm.toLowerCase())
+
+    return allSpecialites.filter(
+      (specialite) =>
+        specialite.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        specialite.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   } catch (error) {
     console.error("Erreur recherche spécialités:", error);
@@ -209,11 +206,11 @@ export const getActiveSpecialites = async () => {
       where("actif", "==", true),
       orderBy("nom")
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Erreur récupération spécialités actives:", error);
@@ -237,10 +234,10 @@ export const incrementCoiffeurCount = async (specialiteId) => {
   try {
     const specialite = await getSpecialiteById(specialiteId);
     if (!specialite) return;
-    
+
     await updateDoc(doc(db, COLLECTION_NAME, specialiteId), {
       nombreCoiffeurs: (specialite.nombreCoiffeurs || 0) + 1,
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     });
   } catch (error) {
     console.error("Erreur incrémentation compteur coiffeurs:", error);
@@ -253,12 +250,12 @@ export const decrementCoiffeurCount = async (specialiteId) => {
   try {
     const specialite = await getSpecialiteById(specialiteId);
     if (!specialite) return;
-    
+
     const newCount = Math.max(0, (specialite.nombreCoiffeurs || 0) - 1);
-    
+
     await updateDoc(doc(db, COLLECTION_NAME, specialiteId), {
       nombreCoiffeurs: newCount,
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     });
   } catch (error) {
     console.error("Erreur décrémentation compteur coiffeurs:", error);
@@ -274,16 +271,16 @@ export const specialiteService = {
   create: createSpecialite,
   update: updateSpecialite,
   delete: deleteSpecialite,
-  
+
   // Méthodes supplémentaires
   checkUniqueName: checkUniqueName,
   search: searchSpecialites,
   getActive: getActiveSpecialites,
   count: countSpecialites,
-  
+
   // Méthodes de gestion des coiffeurs
   incrementCoiffeurCount: incrementCoiffeurCount,
-  decrementCoiffeurCount: decrementCoiffeurCount
+  decrementCoiffeurCount: decrementCoiffeurCount,
 };
 
 export default specialiteService;

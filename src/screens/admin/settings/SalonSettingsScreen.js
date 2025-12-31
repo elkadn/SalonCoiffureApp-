@@ -16,7 +16,7 @@ import {
 import Icon from "react-native-vector-icons/MaterialIcons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { salonService } from "../../../services/salonService";
-import { pickImage } from "../../../services/localImageService";
+import { pickImage } from "../../../services/cloudinaryService";
 
 const DAYS_OF_WEEK = [
   { key: "lundi", label: "Lundi" },
@@ -73,12 +73,17 @@ const SalonSettingsScreen = ({ navigation }) => {
       const imageUri = await pickImage();
       if (imageUri) {
         setSaving(true);
-        const logoPath = await salonService.saveSalonLogo(imageUri);
-        setFormData((prev) => ({ ...prev, logoPath }));
-        Alert.alert("Succès", "Logo mis à jour");
+        const logoUrl = await salonService.saveSalonLogo(imageUri); // Changé de logoPath à logoUrl
+        setFormData((prev) => ({
+          ...prev,
+          logoUrl,
+          logoPath: logoUrl, // Pour compatibilité
+        }));
+        Alert.alert("Succès", "Logo mis à jour sur Cloudinary");
       }
     } catch (error) {
-      Alert.alert("Erreur", "Impossible de sélectionner l'image");
+      console.error("Erreur upload logo:", error);
+      Alert.alert("Erreur", error.message || "Impossible d'uploader l'image");
     } finally {
       setSaving(false);
     }
@@ -178,7 +183,7 @@ const SalonSettingsScreen = ({ navigation }) => {
             {formData.logoPath ? (
               <View style={styles.logoContainer}>
                 <Image
-                  source={{ uri: formData.logoPath }}
+                  source={{ uri: formData.logoUrl }}
                   style={styles.logoImage}
                   resizeMode="contain"
                 />
@@ -198,6 +203,9 @@ const SalonSettingsScreen = ({ navigation }) => {
                     <Text style={styles.logoActionText}>Supprimer</Text>
                   </TouchableOpacity>
                 </View>
+                <Text style={styles.cloudinaryInfo}>
+                  ✓ Image stockée sur Cloudinary
+                </Text>
               </View>
             ) : (
               <TouchableOpacity

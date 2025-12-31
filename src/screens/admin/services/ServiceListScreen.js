@@ -16,6 +16,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { serviceService } from "../../../services/serviceService";
 import { productService } from "../../../services/productService";
 import { useFocusEffect } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/MaterialIcons";
+
 
 const ServiceListScreen = ({ navigation }) => {
   const [services, setServices] = useState([]);

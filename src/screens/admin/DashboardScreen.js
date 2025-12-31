@@ -61,6 +61,13 @@ const DashboardScreen = ({ navigation }) => {
       color: "#673AB7",
     },
     {
+      title: "✂️ Gestion des Services",
+      description: "Ajouter, modifier, supprimer les services",
+      screen: "ServiceManagement",
+      icon: "✂️",
+      color: "#FF5722",
+    },
+    {
       title: "📅 Gestion des Rendez-vous",
       description: "Voir et gérer les réservations",
       screen: "AppointmentManagement",
@@ -73,13 +80,6 @@ const DashboardScreen = ({ navigation }) => {
       screen: "SalonSettings",
       icon: "🏢",
       color: "#607D8B",
-    },
-    {
-      title: "✂️ Gestion des Services",
-      description: "Ajouter, modifier, supprimer les services",
-      screen: "ServiceManagement",
-      icon: "✂️",
-      color: "#FF5722",
     },
   ];
 

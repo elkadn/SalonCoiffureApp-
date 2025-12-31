@@ -1,19 +1,19 @@
 // services/productService.js
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc, 
-  deleteDoc, 
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
   getDocs,
   query,
   where,
   orderBy,
   serverTimestamp,
-  writeBatch
-} from 'firebase/firestore';
-import { db } from '../firebase/firebaseConfig';
+  writeBatch,
+} from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 // ============ CATÉGORIES ============
 const CATEGORIES_COLLECTION = "categories";
@@ -26,10 +26,10 @@ export const getAllCategories = async () => {
     const categoriesRef = collection(db, CATEGORIES_COLLECTION);
     const q = query(categoriesRef, orderBy("nom"));
     const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => ({
+
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Erreur récupération catégories:", error);
@@ -39,12 +39,14 @@ export const getAllCategories = async () => {
 
 export const getCategoryById = async (categoryId) => {
   try {
-    const categoryDoc = await getDoc(doc(db, CATEGORIES_COLLECTION, categoryId));
-    
+    const categoryDoc = await getDoc(
+      doc(db, CATEGORIES_COLLECTION, categoryId)
+    );
+
     if (categoryDoc.exists()) {
       return {
         id: categoryDoc.id,
-        ...categoryDoc.data()
+        ...categoryDoc.data(),
       };
     }
     return null;
@@ -54,64 +56,14 @@ export const getCategoryById = async (categoryId) => {
   }
 };
 
-// export const createCategory = async (categoryData) => {
-//   try {
-//     // Vérifier si la catégorie existe déjà
-//     const isUnique = await checkUniqueCategoryName(categoryData.nom);
-//     if (!isUnique) {
-//       throw new Error("Cette catégorie existe déjà");
-//     }
-
-//     const categoryDoc = {
-//       nom: categoryData.nom.trim(),
-//       description: categoryData.description?.trim() || "",
-//       dateCreation: serverTimestamp(),
-//       dateModification: serverTimestamp(),
-//       actif: true,
-//       nombreProduits: 0
-//     };
-
-//     const newDocRef = doc(collection(db, CATEGORIES_COLLECTION));
-//     await setDoc(newDocRef, categoryDoc);
-    
-//     return {
-//       id: newDocRef.id,
-//       ...categoryDoc
-//     };
-//   } catch (error) {
-//     console.error("Erreur création catégorie:", error);
-//     throw error;
-//   }
-// };
-
-// export const updateCategory = async (categoryId, categoryData) => {
-//   try {
-//     // Vérifier si le nom est unique
-//     const isUnique = await checkUniqueCategoryName(categoryData.nom, categoryId);
-//     if (!isUnique) {
-//       throw new Error("Cette catégorie existe déjà");
-//     }
-
-//     const dataToUpdate = {
-//       nom: categoryData.nom.trim(),
-//       description: categoryData.description?.trim() || "",
-//       dateModification: serverTimestamp()
-//     };
-
-//     await updateDoc(doc(db, CATEGORIES_COLLECTION, categoryId), dataToUpdate);
-//     return await getCategoryById(categoryId);
-//   } catch (error) {
-//     console.error("Erreur mise à jour catégorie:", error);
-//     throw error;
-//   }
-// };
-
 export const deleteCategory = async (categoryId) => {
   try {
     // Vérifier si la catégorie a des produits
     const products = await getProductsByCategory(categoryId);
     if (products.length > 0) {
-      throw new Error("Impossible de supprimer : cette catégorie contient des produits");
+      throw new Error(
+        "Impossible de supprimer : cette catégorie contient des produits"
+      );
     }
 
     await deleteDoc(doc(db, CATEGORIES_COLLECTION, categoryId));
@@ -126,23 +78,23 @@ export const deleteCategory = async (categoryId) => {
 //   try {
 //     const categoriesRef = collection(db, CATEGORIES_COLLECTION);
 //     const nomLower = nom.trim().toLowerCase();
-    
+
 //     const q = query(
 //       categoriesRef,
 //       where("nom", ">=", nomLower),
 //       where("nom", "<=", nomLower + "\uf8ff")
 //     );
-    
+
 //     const snapshot = await getDocs(q);
-    
+
 //     const existingCategories = snapshot.docs
 //       .filter(doc => excludeId ? doc.id !== excludeId : true)
 //       .filter(doc => {
 //         const data = doc.data();
-//         return data.actif !== false && 
+//         return data.actif !== false &&
 //                data.nom.toLowerCase() === nomLower;
 //       });
-    
+
 //     return existingCategories.length === 0;
 //   } catch (error) {
 //     console.error("Erreur vérification nom catégorie:", error);
@@ -152,7 +104,6 @@ export const deleteCategory = async (categoryId) => {
 
 // === FOURNISSEURS ===
 
-
 // services/productService.js - CORRECTION
 // Version alternative - plus lente mais sans champ supplémentaire
 export const checkUniqueCategoryName = async (nom, excludeId = null) => {
@@ -160,20 +111,20 @@ export const checkUniqueCategoryName = async (nom, excludeId = null) => {
     const categoriesRef = collection(db, CATEGORIES_COLLECTION);
     const q = query(categoriesRef, where("actif", "==", true));
     const snapshot = await getDocs(q);
-    
+
     const nomLower = nom.trim().toLowerCase();
-    
-    const exists = snapshot.docs.some(doc => {
+
+    const exists = snapshot.docs.some((doc) => {
       const data = doc.data();
       const dataNomLower = data.nom?.trim().toLowerCase() || "";
-      
+
       // Vérifier l'égalité insensible à la casse
       const sameName = dataNomLower === nomLower;
       const sameId = excludeId ? doc.id === excludeId : false;
-      
+
       return sameName && !sameId;
     });
-    
+
     return !exists;
   } catch (error) {
     console.error("Erreur vérification nom catégorie:", error);
@@ -191,7 +142,7 @@ export const createCategory = async (categoryData) => {
     }
 
     const nomLower = categoryData.nom.trim().toLowerCase();
-    
+
     const categoryDoc = {
       nom: categoryData.nom.trim(),
       nom_lower: nomLower, // AJOUTER CE CHAMP
@@ -199,15 +150,15 @@ export const createCategory = async (categoryData) => {
       dateCreation: serverTimestamp(),
       dateModification: serverTimestamp(),
       actif: true,
-      nombreProduits: 0
+      nombreProduits: 0,
     };
 
     const newDocRef = doc(collection(db, CATEGORIES_COLLECTION));
     await setDoc(newDocRef, categoryDoc);
-    
+
     return {
       id: newDocRef.id,
-      ...categoryDoc
+      ...categoryDoc,
     };
   } catch (error) {
     console.error("Erreur création catégorie:", error);
@@ -218,18 +169,21 @@ export const createCategory = async (categoryData) => {
 export const updateCategory = async (categoryId, categoryData) => {
   try {
     // Vérifier si le nom est unique
-    const isUnique = await checkUniqueCategoryName(categoryData.nom, categoryId);
+    const isUnique = await checkUniqueCategoryName(
+      categoryData.nom,
+      categoryId
+    );
     if (!isUnique) {
       throw new Error("Cette catégorie existe déjà");
     }
 
     const nomLower = categoryData.nom.trim().toLowerCase();
-    
+
     const dataToUpdate = {
       nom: categoryData.nom.trim(),
       nom_lower: nomLower, // AJOUTER CE CHAMP
       description: categoryData.description?.trim() || "",
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     };
 
     await updateDoc(doc(db, CATEGORIES_COLLECTION, categoryId), dataToUpdate);
@@ -240,16 +194,15 @@ export const updateCategory = async (categoryId, categoryData) => {
   }
 };
 
-
 export const getAllSuppliers = async () => {
   try {
     const suppliersRef = collection(db, SUPPLIERS_COLLECTION);
     const q = query(suppliersRef, orderBy("nom"));
     const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => ({
+
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Erreur récupération fournisseurs:", error);
@@ -260,7 +213,10 @@ export const getAllSuppliers = async () => {
 export const createSupplier = async (supplierData) => {
   try {
     // Vérifier si le fournisseur existe déjà
-    const exists = await checkSupplierExists(supplierData.nom, supplierData.email);
+    const exists = await checkSupplierExists(
+      supplierData.nom,
+      supplierData.email
+    );
     if (exists) {
       throw new Error("Ce fournisseur existe déjà");
     }
@@ -273,15 +229,15 @@ export const createSupplier = async (supplierData) => {
       dateCreation: serverTimestamp(),
       dateModification: serverTimestamp(),
       actif: true,
-      nombreProduits: 0
+      nombreProduits: 0,
     };
 
     const newDocRef = doc(collection(db, SUPPLIERS_COLLECTION));
     await setDoc(newDocRef, supplierDoc);
-    
+
     return {
       id: newDocRef.id,
-      ...supplierDoc
+      ...supplierDoc,
     };
   } catch (error) {
     console.error("Erreur création fournisseur:", error);
@@ -292,20 +248,14 @@ export const createSupplier = async (supplierData) => {
 export const checkSupplierExists = async (nom, email) => {
   try {
     const suppliersRef = collection(db, SUPPLIERS_COLLECTION);
-    const q = query(
-      suppliersRef,
-      where("nom", "==", nom.trim())
-    );
-    
+    const q = query(suppliersRef, where("nom", "==", nom.trim()));
+
     const snapshot = await getDocs(q);
     if (!snapshot.empty) return true;
-    
+
     // Vérifier aussi par email
-    const q2 = query(
-      suppliersRef,
-      where("email", "==", email.trim())
-    );
-    
+    const q2 = query(suppliersRef, where("email", "==", email.trim()));
+
     const snapshot2 = await getDocs(q2);
     return !snapshot2.empty;
   } catch (error) {
@@ -317,11 +267,11 @@ export const checkSupplierExists = async (nom, email) => {
 export const getSupplierById = async (supplierId) => {
   try {
     const supplierDoc = await getDoc(doc(db, SUPPLIERS_COLLECTION, supplierId));
-    
+
     if (supplierDoc.exists()) {
       return {
         id: supplierDoc.id,
-        ...supplierDoc.data()
+        ...supplierDoc.data(),
       };
     }
     return null;
@@ -362,7 +312,7 @@ export const updateSupplier = async (supplierId, supplierData) => {
       telephone: supplierData.telephone?.trim() || "",
       adresse: supplierData.adresse?.trim() || "",
       notes: supplierData.notes?.trim() || "",
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     };
 
     await updateDoc(doc(db, SUPPLIERS_COLLECTION, supplierId), dataToUpdate);
@@ -411,24 +361,29 @@ export const createProduct = async (productData) => {
       categorieNom: productData.categorieNom,
       fournisseurId: productData.fournisseurId,
       fournisseurNom: productData.fournisseurNom,
+      // AJOUTEZ CES LIGNES :
+      imageUrl: productData.imageUrl || null, // URL Cloudinary
+      imagePublicId: productData.imagePublicId || null, // Optionnel
+      // Supprimez ou gardez pour compatibilité :
+      localImagePath: null, // Définir à null
+      // FIN AJOUT
       dateCreation: serverTimestamp(),
       dateModification: serverTimestamp(),
-      localImagePath: productData.localImagePath || null,
-      actif: true
+      actif: true,
     };
 
     const newDocRef = doc(collection(db, PRODUCTS_COLLECTION));
     await setDoc(newDocRef, productDoc);
-    
+
     // Mettre à jour le compteur de produits dans la catégorie
     await updateCategoryProductCount(productData.categorieId, 1);
-    
+
     // Mettre à jour le compteur de produits dans le fournisseur
     await updateSupplierProductCount(productData.fournisseurId, 1);
-    
+
     return {
       id: newDocRef.id,
-      ...productDoc
+      ...productDoc,
     };
   } catch (error) {
     console.error("Erreur création produit:", error);
@@ -441,10 +396,10 @@ export const getAllProducts = async () => {
     const productsRef = collection(db, PRODUCTS_COLLECTION);
     const q = query(productsRef, orderBy("nom"));
     const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => ({
+
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Erreur récupération produits:", error);
@@ -460,11 +415,11 @@ export const getProductsByCategory = async (categoryId) => {
       where("categorieId", "==", categoryId),
       where("actif", "==", true)
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Erreur récupération produits par catégorie:", error);
@@ -480,7 +435,7 @@ export const checkProductCodeExists = async (code) => {
       where("code", "==", code.trim()),
       where("actif", "==", true)
     );
-    
+
     const snapshot = await getDocs(q);
     return !snapshot.empty;
   } catch (error) {
@@ -493,12 +448,12 @@ export const updateCategoryProductCount = async (categoryId, increment) => {
   try {
     const category = await getCategoryById(categoryId);
     if (!category) return;
-    
+
     const newCount = Math.max(0, (category.nombreProduits || 0) + increment);
-    
+
     await updateDoc(doc(db, CATEGORIES_COLLECTION, categoryId), {
       nombreProduits: newCount,
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     });
   } catch (error) {
     console.error("Erreur mise à jour compteur catégorie:", error);
@@ -510,13 +465,13 @@ export const updateSupplierProductCount = async (supplierId, increment) => {
   try {
     const supplierDoc = await getDoc(doc(db, SUPPLIERS_COLLECTION, supplierId));
     if (!supplierDoc.exists()) return;
-    
+
     const supplier = supplierDoc.data();
     const newCount = Math.max(0, (supplier.nombreProduits || 0) + increment);
-    
+
     await updateDoc(doc(db, SUPPLIERS_COLLECTION, supplierId), {
       nombreProduits: newCount,
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     });
   } catch (error) {
     console.error("Erreur mise à jour compteur fournisseur:", error);
@@ -530,11 +485,14 @@ export const updateSupplierProductCount = async (supplierId, increment) => {
 export const getProductById = async (productId) => {
   try {
     const productDoc = await getDoc(doc(db, PRODUCTS_COLLECTION, productId));
-    
+
     if (productDoc.exists()) {
+      const data = productDoc.data();
       return {
         id: productDoc.id,
-        ...productDoc.data()
+        ...data,
+        // Assurer la compatibilité avec l'ancien système
+        imageUrl: data.imageUrl || data.localImagePath || null,
       };
     }
     return null;
@@ -588,12 +546,19 @@ export const updateProduct = async (productId, productData) => {
       categorieNom: productData.categorieNom,
       fournisseurId: productData.fournisseurId,
       fournisseurNom: productData.fournisseurNom,
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     };
 
-    // Ajouter l'image si fournie
+    // AJOUTEZ CETTE SECTION POUR L'IMAGE :
     if (productData.imageUrl) {
       dataToUpdate.imageUrl = productData.imageUrl;
+      dataToUpdate.imagePublicId = productData.imagePublicId || null;
+      // Si on a une nouvelle image, supprimer l'ancien chemin local
+      dataToUpdate.localImagePath = null;
+    } else if (productData.imageUrl === null) {
+      // Si imageUrl est explicitement null, supprimer l'image
+      dataToUpdate.imageUrl = null;
+      dataToUpdate.imagePublicId = null;
     }
 
     await updateDoc(doc(db, PRODUCTS_COLLECTION, productId), dataToUpdate);
@@ -619,7 +584,7 @@ export const deleteProduct = async (productId) => {
     // Supprimer le produit (soft delete)
     await updateDoc(doc(db, PRODUCTS_COLLECTION, productId), {
       actif: false,
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     });
 
     return productId;
@@ -633,11 +598,12 @@ export const deleteProduct = async (productId) => {
 export const searchProducts = async (searchTerm) => {
   try {
     const allProducts = await getAllProducts();
-    
-    return allProducts.filter(product => 
-      product.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description?.toLowerCase().includes(searchTerm.toLowerCase())
+
+    return allProducts.filter(
+      (product) =>
+        product.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   } catch (error) {
     console.error("Erreur recherche produits:", error);
@@ -649,9 +615,9 @@ export const searchProducts = async (searchTerm) => {
 export const getLowStockProducts = async () => {
   try {
     const allProducts = await getAllProducts();
-    return allProducts.filter(product => 
-      product.actif !== false && 
-      product.quantite <= product.seuilAlerte
+    return allProducts.filter(
+      (product) =>
+        product.actif !== false && product.quantite <= product.seuilAlerte
     );
   } catch (error) {
     console.error("Erreur récupération produits en rupture:", error);
@@ -663,12 +629,12 @@ export const getLowStockProducts = async () => {
 export const updateProductQuantity = async (productId, newQuantity) => {
   try {
     const quantity = parseInt(newQuantity) || 0;
-    
+
     await updateDoc(doc(db, PRODUCTS_COLLECTION, productId), {
       quantite: Math.max(0, quantity),
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     });
-    
+
     return productId;
   } catch (error) {
     console.error("Erreur mise à jour quantité:", error);
@@ -679,34 +645,34 @@ export const updateProductQuantity = async (productId, newQuantity) => {
 export const getInventoryStats = async () => {
   try {
     const products = await getAllProducts();
-    const activeProducts = products.filter(p => p.actif !== false);
-    
+    const activeProducts = products.filter((p) => p.actif !== false);
+
     let totalValeurStock = 0;
     let totalValeurAchat = 0;
     let lowStockCount = 0;
     let outOfStockCount = 0;
     let categoriesStats = {};
-    
+
     for (const product of activeProducts) {
       const valeurVente = product.quantite * (product.prixVente || 0);
       const valeurAchat = product.quantite * (product.prixAchat || 0);
-      
+
       totalValeurStock += valeurVente;
       totalValeurAchat += valeurAchat;
-      
+
       if (product.quantite === 0) {
         outOfStockCount++;
       } else if (product.quantite <= product.seuilAlerte) {
         lowStockCount++;
       }
-      
+
       // Stats par catégorie
-      const categorie = product.categorieNom || 'Non catégorisé';
+      const categorie = product.categorieNom || "Non catégorisé";
       if (!categoriesStats[categorie]) {
         categoriesStats[categorie] = {
           count: 0,
           totalValue: 0,
-          lowStock: 0
+          lowStock: 0,
         };
       }
       categoriesStats[categorie].count++;
@@ -715,12 +681,14 @@ export const getInventoryStats = async () => {
         categoriesStats[categorie].lowStock++;
       }
     }
-    
-    const categoriesArray = Object.entries(categoriesStats).map(([name, stats]) => ({
-      name,
-      ...stats
-    })).sort((a, b) => b.totalValue - a.totalValue);
-    
+
+    const categoriesArray = Object.entries(categoriesStats)
+      .map(([name, stats]) => ({
+        name,
+        ...stats,
+      }))
+      .sort((a, b) => b.totalValue - a.totalValue);
+
     return {
       totalProducts: activeProducts.length,
       totalValeurStock: parseFloat(totalValeurStock.toFixed(2)),
@@ -728,7 +696,9 @@ export const getInventoryStats = async () => {
       lowStockCount,
       outOfStockCount,
       categories: categoriesArray,
-      profitPotentiel: parseFloat((totalValeurStock - totalValeurAchat).toFixed(2))
+      profitPotentiel: parseFloat(
+        (totalValeurStock - totalValeurAchat).toFixed(2)
+      ),
     };
   } catch (error) {
     console.error("Erreur calcul statistiques:", error);
@@ -749,22 +719,20 @@ export const getStockMovements = async (limit = 50) => {
 };
 
 // Obtenir les produits par niveau de stock
-export const getProductsByStockLevel = async (level = 'all') => {
+export const getProductsByStockLevel = async (level = "all") => {
   try {
     const allProducts = await getAllProducts();
-    const activeProducts = allProducts.filter(p => p.actif !== false);
-    
+    const activeProducts = allProducts.filter((p) => p.actif !== false);
+
     switch (level) {
-      case 'low':
-        return activeProducts.filter(p => 
-          p.quantite > 0 && p.quantite <= p.seuilAlerte
+      case "low":
+        return activeProducts.filter(
+          (p) => p.quantite > 0 && p.quantite <= p.seuilAlerte
         );
-      case 'out':
-        return activeProducts.filter(p => p.quantite === 0);
-      case 'normal':
-        return activeProducts.filter(p => 
-          p.quantite > p.seuilAlerte
-        );
+      case "out":
+        return activeProducts.filter((p) => p.quantite === 0);
+      case "normal":
+        return activeProducts.filter((p) => p.quantite > p.seuilAlerte);
       default:
         return activeProducts;
     }
@@ -794,7 +762,7 @@ export const productService = {
   updateCategory,
   deleteCategory,
   checkUniqueCategoryName,
-  
+
   // Fournisseurs
   getAllSuppliers,
   createSupplier,
@@ -803,7 +771,6 @@ export const productService = {
   updateSupplier,
   deleteSupplier,
 
-  
   // Produits
   createProduct,
   getAllProducts,
@@ -816,10 +783,10 @@ export const productService = {
   getStockMovements,
   getProductsByStockLevel,
   addStockMovement,
-  
+
   // Utilitaires
   updateCategoryProductCount,
-  updateSupplierProductCount
+  updateSupplierProductCount,
 };
 
 export default productService;

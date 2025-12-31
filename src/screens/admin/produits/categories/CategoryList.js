@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { productService } from '../../../../services/productService';
+import { productService } from "../../../../services/productService";
 import { useFocusEffect } from "@react-navigation/native";
 
 const CategoryList = ({ navigation }) => {
@@ -20,12 +20,11 @@ const CategoryList = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
- useFocusEffect(
-  useCallback(() => {
-    loadCategories();
-  }, [])
-);
-
+  useFocusEffect(
+    useCallback(() => {
+      loadCategories();
+    }, [])
+  );
 
   const loadCategories = async () => {
     try {
@@ -66,7 +65,10 @@ const CategoryList = ({ navigation }) => {
       Alert.alert("Succès", "Catégorie supprimée avec succès");
       loadCategories();
     } catch (error) {
-      Alert.alert("Erreur", error.message || "Impossible de supprimer la catégorie");
+      Alert.alert(
+        "Erreur",
+        error.message || "Impossible de supprimer la catégorie"
+      );
     }
   };
 
@@ -106,7 +108,8 @@ const CategoryList = ({ navigation }) => {
         <View style={styles.infoCard}>
           <Icon name="info" size={20} color="#4CAF50" />
           <Text style={styles.infoText}>
-            Les catégories permettent d'organiser vos produits. Chaque catégorie doit avoir un nom unique.
+            Les catégories permettent d'organiser vos produits. Chaque catégorie
+            doit avoir un nom unique.
           </Text>
         </View>
 

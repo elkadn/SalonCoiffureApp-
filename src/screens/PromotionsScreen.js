@@ -410,7 +410,7 @@ const PromotionsScreen = ({ navigation }) => {
         >
           <Icon name="event-available" size={24} color="#FFF" />
           <Text style={styles.reservationButtonText}>
-            Réserver maintenant avec promotion
+            Réserver maintenant
           </Text>
         </TouchableOpacity>
       </ScrollView>

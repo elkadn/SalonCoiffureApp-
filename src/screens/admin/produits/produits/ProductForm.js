@@ -21,10 +21,8 @@ import { productService } from "../../../../services/productService";
 import * as FileSystem from "expo-file-system/legacy";
 import {
   pickImage,
-  saveProductImage,
-  deleteProductImage,
-  loadProductImage,
-} from "../../../../services/localImageService";
+  uploadProductImage,
+} from "../../../../services/cloudinaryService";
 
 const ProductForm = ({ navigation, route }) => {
   const { productId } = route.params || {};
@@ -63,7 +61,6 @@ const ProductForm = ({ navigation, route }) => {
     try {
       setLoading(true);
 
-      // Charger les catégories et fournisseurs
       const [categoriesData, suppliersData] = await Promise.all([
         productService.getAllCategories(),
         productService.getAllSuppliers(),
@@ -72,7 +69,6 @@ const ProductForm = ({ navigation, route }) => {
       setCategories(categoriesData);
       setSuppliers(suppliersData);
 
-      // Si en mode édition, charger le produit
       if (isEditMode) {
         const product = await productService.getProductById(productId);
         if (product) {
@@ -85,19 +81,15 @@ const ProductForm = ({ navigation, route }) => {
           setSeuilAlerte(product.seuilAlerte?.toString() || "10");
           setSelectedCategory(product.categorieId);
           setSelectedSupplier(product.fournisseurId);
-          setImageUrl(product.imageUrl || null);
 
-          // Stocker le chemin de l'image existante
-          if (product.localImagePath) {
+          // Charger l'URL Cloudinary (priorité) ou l'image locale (compatibilité)
+          if (product.imageUrl) {
+            setImageUrl(product.imageUrl); // URL Cloudinary
+          } else if (product.localImagePath) {
+            // Ancien système local - à migrer
             setExistingImagePath(product.localImagePath);
-            // Vérifier si l'image existe toujours
-            const imageExists = await loadProductImage(product.localImagePath);
-            if (!imageExists) {
-              console.warn("⚠️ Image non trouvée:", product.localImagePath);
-            }
           }
 
-          // Trouver et sélectionner la catégorie et le fournisseur correspondants
           const category = categoriesData.find(
             (c) => c.id === product.categorieId
           );
@@ -121,8 +113,8 @@ const ProductForm = ({ navigation, route }) => {
     try {
       const uri = await pickImage();
       if (uri) {
-        setImageUri(uri); // Stocker l'URI temporaire
-        setExistingImagePath(null); // Effacer le chemin existant si nouvelle image
+        setImageUri(uri);
+        setExistingImagePath(null);
       }
     } catch (error) {
       Alert.alert(
@@ -160,58 +152,60 @@ const ProductForm = ({ navigation, route }) => {
         fournisseurNom: supplier.nom,
       };
 
-      // === GESTION DES IMAGES SIMPLIFIÉE ===
-      let finalImagePath = existingImagePath; // Garder l'image existante par défaut
+      // === GESTION DES IMAGES CLOUDINARY ===
+      let cloudinaryImageUrl = imageUrl; // Garder l'URL existante par défaut
 
       if (imageUri) {
         // Si une nouvelle image a été sélectionnée
         try {
-          console.log("💾 Sauvegarde de la nouvelle image...");
+          console.log("📤 Upload image produit vers Cloudinary...");
 
-          // Déterminer l'ID du produit
-          const targetProductId = isEditMode ? productId : `temp_${Date.now()}`;
+          // Déterminer le nom du produit pour le nom de fichier
+          const productName = nom.trim().replace(/\s+/g, "_").substring(0, 20);
+          const folder = "product_images";
 
-          // Sauvegarder l'image
-          finalImagePath = await saveProductImage(imageUri, targetProductId);
-          console.log("✅ Image sauvegardée:", finalImagePath);
+          // Upload vers Cloudinary
+          const cloudinaryResult = await uploadProductImage(imageUri, nom);
 
-          // Si mode édition et image existante différente, supprimer l'ancienne
-          if (
-            isEditMode &&
-            existingImagePath &&
-            existingImagePath !== finalImagePath
-          ) {
-            await deleteProductImage(existingImagePath);
-            console.log("🗑️ Ancienne image supprimée");
-          }
+          console.log("✅ Image uploadée:", cloudinaryResult.url);
+          cloudinaryImageUrl = cloudinaryResult.url;
+
+          // Stocker aussi le public_id si besoin
+          productData.imagePublicId = cloudinaryResult.public_id;
         } catch (imageError) {
-          console.error("❌ Erreur image:", imageError);
+          console.error("❌ Erreur upload image Cloudinary:", imageError);
           Alert.alert(
             "Attention",
-            "L'image n'a pas pu être sauvegardée, mais le produit sera enregistré."
+            "L'image n'a pas pu être uploadée sur Cloudinary, mais le produit sera enregistré."
           );
-          finalImagePath = null; // Pas d'image
+          cloudinaryImageUrl = null; // Pas d'image
         }
       }
 
-      // Ajouter le chemin de l'image au produit
-      if (finalImagePath) {
-        productData.localImagePath = finalImagePath;
+      // Ajouter l'URL Cloudinary au produit
+      if (cloudinaryImageUrl) {
+        productData.imageUrl = cloudinaryImageUrl;
       }
 
+      // Supprimer les anciens champs d'images locales
+      delete productData.localImagePath;
+      delete productData.imagePath;
+
+      console.log("💾 Sauvegarde du produit...");
       // Sauvegarder le produit
       if (isEditMode) {
         await productService.updateProduct(productId, productData);
-        Alert.alert("Succès", "Produit modifié avec succès");
+        Alert.alert("✅ Succès", "Produit modifié avec succès");
       } else {
         const newProduct = await productService.createProduct(productData);
-        Alert.alert("Succès", "Produit créé avec succès");
+        Alert.alert("✅ Succès", "Produit créé avec succès");
       }
 
+      console.log("🎉 Produit sauvegardé!");
       navigation.goBack();
     } catch (error) {
-      console.error("Erreur complète:", error);
-      Alert.alert("Erreur", error.message || "Une erreur est survenue");
+      console.error("❌ Erreur complète:", error);
+      Alert.alert("❌ Erreur", error.message || "Une erreur est survenue");
     } finally {
       setSaving(false);
     }
@@ -286,11 +280,7 @@ const ProductForm = ({ navigation, route }) => {
     if (imageUri) {
       return { uri: imageUri };
     }
-    // Sinon, utiliser l'image existante
-    if (existingImagePath && existingImagePath.startsWith("file://")) {
-      return { uri: existingImagePath };
-    }
-    // Sinon, URL distante
+    // Sinon, utiliser l'URL Cloudinary existante
     if (imageUrl) {
       return { uri: imageUrl };
     }

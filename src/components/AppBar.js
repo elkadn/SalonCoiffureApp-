@@ -31,7 +31,10 @@ export const AppBar = ({
       const info = await salonService.getSalonInfo();
       setSalonInfo(info);
 
-      if (info.logoPath) {
+      // Priorité à logoUrl (Cloudinary), fallback à logoPath (ancien système)
+      if (info.logoUrl) {
+        setLogoUri(info.logoUrl); // URL Cloudinary directe
+      } else if (info.logoPath) {
         setLogoUri(info.logoPath);
       }
     } catch (error) {

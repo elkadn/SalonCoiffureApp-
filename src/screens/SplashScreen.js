@@ -1,12 +1,6 @@
 // screens/SplashScreen.js - VERSION DYNAMIQUE
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Image,
-} from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, Image } from "react-native";
 import { salonService } from "../services/salonService";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
@@ -22,28 +16,29 @@ const SplashScreen = ({ navigation }) => {
         setLoadingText("Chargement du salon...");
         const salonInfo = await salonService.getSalonInfo();
         setSalonName(salonInfo.nom);
-        
-        // 2. Essayer de charger le logo
-        if (salonInfo.logoPath) {
+
+        if (salonInfo.logoUrl) {
+          setLoadingText("Chargement du logo...");
+          setLogoUri(salonInfo.logoUrl);
+        } else if (salonInfo.logoPath) {
           setLoadingText("Chargement du logo...");
           const logo = await salonService.loadSalonLogo();
           if (logo) {
             setLogoUri(logo);
           }
         }
-        
+
         // 3. Simulation de chargement
         setTimeout(() => {
           setLoadingText("Préparation de l'application...");
         }, 500);
-        
+
         // 4. Navigation
         setTimeout(() => {
           navigation.replace("Main");
         }, 2000);
-        
       } catch (error) {
-        console.error('Erreur initialisation:', error);
+        console.error("Erreur initialisation:", error);
         // Fallback si erreur
         setTimeout(() => {
           navigation.replace("Main");
@@ -73,14 +68,10 @@ const SplashScreen = ({ navigation }) => {
         </View>
       )}
 
-      <ActivityIndicator
-        size="large"
-        color="#4CAF50"
-        style={styles.spinner}
-      />
+      <ActivityIndicator size="large" color="#4CAF50" style={styles.spinner} />
 
       <Text style={styles.loadingText}>{loadingText}</Text>
-      
+
       {/* Information du salon */}
       {salonName && (
         <View style={styles.salonInfo}>

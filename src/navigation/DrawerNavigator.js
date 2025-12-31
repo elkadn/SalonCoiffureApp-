@@ -16,7 +16,6 @@ import HomeScreen from "../screens/HomeScreen";
 import LoginScreen from "../screens/auth/LoginScreen";
 import DashboardScreen from "../screens/admin/DashboardScreen";
 import UserListScreen from "../screens/admin/users/UserListScreen";
-import CoiffeurManagement from "../screens/admin/CoiffeurManagement";
 import ProductManagement from "../screens/admin/produits/ProductManagement";
 import UserFormScreen from "../screens/admin/users/UserFormScreen";
 import UserDetailScreen from "../screens/admin/users/UserDetailScreen";
@@ -58,6 +57,7 @@ import OrderDetail from "../screens/admin/commandes/OrderDetail";
 import StylistAppointments from "../screens/styliste/StylistAppointments";
 import AppointmentDetail from "../screens/styliste/AppointmentDetail";
 import PromotionsScreen from "../screens/PromotionsScreen";
+import CoiffeurManagement from "../screens/admin/specialites/CoiffeurManagement";
 
 const Stack = createNativeStackNavigator();
 
@@ -99,13 +99,16 @@ export const CustomDrawer = ({ navigation, drawerVisible, closeDrawer }) => {
                   icon: "📅",
                 },
               ]
-            : [
+            : userData?.role === "client"
+            ? [
                 {
                   label: "Mes rendez-vous",
                   screen: "Appointments",
                   icon: "📅",
                 },
-              ]),
+              ]
+            : []),
+
           { label: "Services", screen: "Services", icon: "💇" },
         ]
       : []),
@@ -130,6 +133,11 @@ export const CustomDrawer = ({ navigation, drawerVisible, closeDrawer }) => {
             label: "Gestion Services",
             screen: "ServiceManagement",
             icon: "💈",
+          },
+          {
+            label: "Gestion Rendez-vous",
+            screen: "AppointmentManagement",
+            icon: "⏰",
           },
           { label: "Paramètres du Salon", screen: "SalonSettings", icon: "⚙️" },
         ]
@@ -565,7 +573,7 @@ const DrawerNavigator = () => {
           return <StylistAppointmentsWithDrawer {...props} />;
         }}
       </Stack.Screen>
-       <Stack.Screen name="AppointmentDetail">
+      <Stack.Screen name="AppointmentDetail">
         {(props) => {
           const AppointmentDetailWithDrawer = withDrawer(AppointmentDetail);
           return <AppointmentDetailWithDrawer {...props} />;

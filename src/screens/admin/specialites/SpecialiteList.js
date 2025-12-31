@@ -1,5 +1,5 @@
 // screens/admin/SpecialiteList.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -13,19 +13,22 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 // En haut du fichier SpecialiteList.js et SpecialiteForm.js
-import { 
+import {
   getAllSpecialites,
- 
-} from '../../../services/specialiteService';
+  deleteSpecialite,
+} from "../../../services/specialiteService";
+import { useFocusEffect } from "@react-navigation/native";
 
 const SpecialiteList = ({ navigation }) => {
   const [specialites, setSpecialites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    loadSpecialites();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadSpecialites();
+    }, [])
+  );
 
   // Remplacer la fonction loadSpecialites :
   const loadSpecialites = async () => {
@@ -48,29 +51,48 @@ const SpecialiteList = ({ navigation }) => {
     }
   };
 
-  const handleDelete = (id, nom) => {
+  const handleDeleteSpecialite = async (id) => {
+    try {
+      setLoading(true); // Ajouter un indicateur de chargement
+
+      await deleteSpecialite(id);
+
+      // Petit délai pour laisser le temps à l'UI de se mettre à jour
+      setTimeout(() => {
+        Alert.alert("Succès", "Spécialité supprimée avec succès");
+        loadSpecialites();
+      }, 100);
+    } catch (error) {
+      console.error("Erreur détaillée suppression:", error);
+
+      // Afficher un message d'erreur plus spécifique
+      let errorMessage = "Impossible de supprimer la spécialité";
+      if (error.message.includes("suppression")) {
+        errorMessage = "Erreur lors de la suppression de la spécialité";
+      }
+
+      Alert.alert("Erreur", errorMessage);
+      setLoading(false);
+    }
+  };
+
+  const confirmDelete = (id, nom) => {
     Alert.alert(
       "Supprimer la spécialité",
       `Êtes-vous sûr de vouloir supprimer "${nom}" ?`,
       [
-        { text: "Annuler", style: "cancel" },
+        {
+          text: "Annuler",
+          style: "cancel",
+          onPress: () => console.log("Suppression annulée"),
+        },
         {
           text: "Supprimer",
           style: "destructive",
-          onPress: () => deleteSpecialite(id),
+          onPress: () => handleDeleteSpecialite(id),
         },
       ]
     );
-  };
-
-  const deleteSpecialite = async (id) => {
-    try {
-      await specialiteService.delete(id);
-      Alert.alert("Succès", "Spécialité supprimée avec succès");
-      loadSpecialites();
-    } catch (error) {
-      Alert.alert("Erreur", "Impossible de supprimer la spécialité");
-    }
   };
 
   const onRefresh = () => {
@@ -152,7 +174,7 @@ const SpecialiteList = ({ navigation }) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.deleteButton}
-                  onPress={() => handleDelete(specialite.id, specialite.nom)}
+                  onPress={() => confirmDelete(specialite.id, specialite.nom)} 
                 >
                   <Icon name="delete" size={20} color="#F44336" />
                 </TouchableOpacity>

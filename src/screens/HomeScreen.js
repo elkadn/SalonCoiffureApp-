@@ -13,14 +13,16 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { getAllServices } from "../services/serviceService";
 import { getSalonInfo } from "../services/salonService";
+import { useAuth } from "../context/AuthContext";
 
 const { width } = Dimensions.get("window");
 
 const HomeScreen = ({ navigation }) => {
   const [featuredServices, setFeaturedServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [salonInfo, setSalonInfo] = useState(null); // ← NOUVEAU ÉTAT
-  const [salonLoading, setSalonLoading] = useState(true); // ← NOUVEAU ÉTAT
+  const [salonInfo, setSalonInfo] = useState(null);
+  const [salonLoading, setSalonLoading] = useState(true);
+  const { userData } = useAuth();
 
   useEffect(() => {
     loadFeaturedServices();
@@ -137,34 +139,37 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         {/* Section fonctionnalités */}
-        <View style={styles.featuresSection}>
-          <TouchableOpacity
-            style={styles.featureCard}
-            onPress={() => navigation.navigate("Services")}
-          >
-            <View style={styles.featureIcon}>
-              <Ionicons name="calendar" size={28} color="#FF6B6B" />
-            </View>
-            <Text style={styles.featureText}>Prendre RDV</Text>
-          </TouchableOpacity>
+        {/* Section fonctionnalités (CLIENT SEULEMENT) */}
+        {userData?.role === "client" && (
+          <View style={styles.featuresSection}>
+            <TouchableOpacity
+              style={styles.featureCard}
+              onPress={() => navigation.navigate("Services")}
+            >
+              <View style={styles.featureIcon}>
+                <Ionicons name="calendar" size={28} color="#FF6B6B" />
+              </View>
+              <Text style={styles.featureText}>Prendre RDV</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.featureCard}>
-            <View style={styles.featureIcon}>
-              <Ionicons name="receipt" size={28} color="#4ECDC4" />
-            </View>
-            <Text style={styles.featureText}>Facturation</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.featureCard}>
+              <View style={styles.featureIcon}>
+                <Ionicons name="receipt" size={28} color="#4ECDC4" />
+              </View>
+              <Text style={styles.featureText}>Facturation</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.featureCard}
-            onPress={() => navigation.navigate("MyReviews")}
-          >
-            <View style={styles.featureIcon}>
-              <Ionicons name="star" size={28} color="#FFD166" />
-            </View>
-            <Text style={styles.featureText}>Mes avis</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={styles.featureCard}
+              onPress={() => navigation.navigate("MyReviews")}
+            >
+              <View style={styles.featureIcon}>
+                <Ionicons name="star" size={28} color="#FFD166" />
+              </View>
+              <Text style={styles.featureText}>Mes avis</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Section services populaires */}
         <View style={styles.section}>

@@ -1,19 +1,19 @@
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc, 
-  deleteDoc, 
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
   getDocs,
   query,
   where,
   orderBy,
   serverTimestamp,
   arrayUnion,
-  arrayRemove
-} from 'firebase/firestore';
-import { db } from '../firebase/firebaseConfig';
+  arrayRemove,
+} from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 // Collections
 const SERVICES_COLLECTION = "services";
@@ -27,16 +27,18 @@ export const createService = async (serviceData) => {
   try {
     // Calculer le prix minimum basé sur les produits associés
     let prixMinimum = parseFloat(serviceData.prix) || 0;
-    
+
     // Vérifier le prix si des produits sont associés
     if (serviceData.produitsIds && serviceData.produitsIds.length > 0) {
       const produits = await getProductsByIds(serviceData.produitsIds);
       const totalPrixProduits = produits.reduce((sum, produit) => {
         return sum + (produit.prixVente || 0);
       }, 0);
-      
+
       if (prixMinimum < totalPrixProduits) {
-        throw new Error(`Le prix du service (${prixMinimum} €) doit être au moins égal à la somme des produits (${totalPrixProduits} €)`);
+        throw new Error(
+          `Le prix du service (${prixMinimum} €) doit être au moins égal à la somme des produits (${totalPrixProduits} €)`
+        );
       }
     }
 
@@ -44,22 +46,23 @@ export const createService = async (serviceData) => {
       nom: serviceData.nom.trim(),
       description: serviceData.description?.trim() || "",
       prix: prixMinimum,
-      duree: parseInt(serviceData.duree) || 30, // en minutes
+      duree: parseInt(serviceData.duree) || 30,
       produitsIds: serviceData.produitsIds || [],
       stylistesIds: serviceData.stylistesIds || [],
-      images: serviceData.images || [], // Chemins locaux des images
+      images: serviceData.images || [], // Maintenant ce sont des URLs Cloudinary
+      imageUrls: serviceData.images || [], // Pour compatibilité, ajoutez ce champ aussi
       categorie: serviceData.categorie?.trim() || "",
       actif: true,
       dateCreation: serverTimestamp(),
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     };
 
     const newDocRef = doc(collection(db, SERVICES_COLLECTION));
     await setDoc(newDocRef, serviceDoc);
-    
+
     return {
       id: newDocRef.id,
-      ...serviceDoc
+      ...serviceDoc,
     };
   } catch (error) {
     console.error("Erreur création service:", error);
@@ -73,10 +76,10 @@ export const getAllServices = async () => {
     const servicesRef = collection(db, SERVICES_COLLECTION);
     const q = query(servicesRef, orderBy("dateCreation", "desc"));
     const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => ({
+
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Erreur récupération services:", error);
@@ -88,11 +91,11 @@ export const getAllServices = async () => {
 export const getServiceById = async (serviceId) => {
   try {
     const serviceDoc = await getDoc(doc(db, SERVICES_COLLECTION, serviceId));
-    
+
     if (serviceDoc.exists()) {
       return {
         id: serviceDoc.id,
-        ...serviceDoc.data()
+        ...serviceDoc.data(),
       };
     }
     return null;
@@ -112,33 +115,37 @@ export const updateService = async (serviceId, serviceData) => {
 
     // Calculer le prix minimum basé sur les produits associés
     let prixMinimum = parseFloat(serviceData.prix) || existingService.prix;
-    
+
     // Vérifier le prix si des produits sont associés
     if (serviceData.produitsIds && serviceData.produitsIds.length > 0) {
       const produits = await getProductsByIds(serviceData.produitsIds);
       const totalPrixProduits = produits.reduce((sum, produit) => {
         return sum + (produit.prixVente || 0);
       }, 0);
-      
+
       if (prixMinimum < totalPrixProduits) {
-        throw new Error(`Le prix du service (${prixMinimum} €) doit être au moins égal à la somme des produits (${totalPrixProduits} €)`);
+        throw new Error(
+          `Le prix du service (${prixMinimum} €) doit être au moins égal à la somme des produits (${totalPrixProduits} €)`
+        );
       }
     }
 
     const dataToUpdate = {
       nom: serviceData.nom?.trim() || existingService.nom,
-      description: serviceData.description?.trim() || existingService.description,
+      description:
+        serviceData.description?.trim() || existingService.description,
       prix: prixMinimum,
       duree: parseInt(serviceData.duree) || existingService.duree,
       produitsIds: serviceData.produitsIds || existingService.produitsIds,
       stylistesIds: serviceData.stylistesIds || existingService.stylistesIds,
       categorie: serviceData.categorie?.trim() || existingService.categorie,
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     };
 
     // Gérer les images si fournies
     if (serviceData.images) {
       dataToUpdate.images = serviceData.images;
+      dataToUpdate.imageUrls = serviceData.images; // Pour compatibilité
     }
 
     await updateDoc(doc(db, SERVICES_COLLECTION, serviceId), dataToUpdate);
@@ -154,9 +161,9 @@ export const deleteService = async (serviceId) => {
   try {
     await updateDoc(doc(db, SERVICES_COLLECTION, serviceId), {
       actif: false,
-      dateModification: serverTimestamp()
+      dateModification: serverTimestamp(),
     });
-    
+
     console.log("Service désactivé :", serviceId);
     return serviceId;
   } catch (error) {
@@ -169,15 +176,17 @@ export const deleteService = async (serviceId) => {
 export const getProductsByIds = async (productIds) => {
   try {
     if (!productIds || productIds.length === 0) return [];
-    
+
     const products = [];
     for (const productId of productIds) {
       try {
-        const productDoc = await getDoc(doc(db, PRODUCTS_COLLECTION, productId));
+        const productDoc = await getDoc(
+          doc(db, PRODUCTS_COLLECTION, productId)
+        );
         if (productDoc.exists()) {
           products.push({
             id: productDoc.id,
-            ...productDoc.data()
+            ...productDoc.data(),
           });
         }
       } catch (error) {
@@ -195,17 +204,17 @@ export const getProductsByIds = async (productIds) => {
 export const getStylistesByIds = async (stylisteIds) => {
   try {
     if (!stylisteIds || stylisteIds.length === 0) return [];
-    
+
     const stylistes = [];
     for (const stylisteId of stylisteIds) {
       try {
         const stylisteDoc = await getDoc(doc(db, USERS_COLLECTION, stylisteId));
         if (stylisteDoc.exists()) {
           const data = stylisteDoc.data();
-          if (data.role === 'stylist') {
+          if (data.role === "stylist") {
             stylistes.push({
               id: stylisteDoc.id,
-              ...data
+              ...data,
             });
           }
         }
@@ -231,17 +240,17 @@ export const getAllStylistes = async () => {
       where("actif", "==", true)
       // Retirez orderBy s'il cause des problèmes
     );
-    
+
     const snapshot = await getDocs(q);
-    const stylistes = snapshot.docs.map(doc => ({
+    const stylistes = snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
-    
+
     // Tri localement si besoin
     return stylistes.sort((a, b) => {
-      const nomA = (a.prenom || '').toLowerCase();
-      const nomB = (b.prenom || '').toLowerCase();
+      const nomA = (a.prenom || "").toLowerCase();
+      const nomB = (b.prenom || "").toLowerCase();
       return nomA.localeCompare(nomB);
     });
   } catch (error) {
@@ -255,13 +264,15 @@ export const getAllStylistes = async () => {
 export const searchServices = async (searchTerm) => {
   try {
     const allServices = await getAllServices();
-    
-    return allServices.filter(service => 
-      service.actif !== false && (
-        service.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.categorie?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+
+    return allServices.filter(
+      (service) =>
+        service.actif !== false &&
+        (service.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          service.description
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          service.categorie?.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   } catch (error) {
     console.error("Erreur recherche services:", error);
@@ -278,11 +289,11 @@ export const getServicesByCategory = async (category) => {
       where("categorie", "==", category),
       where("actif", "==", true)
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Erreur récupération services par catégorie:", error);
@@ -299,11 +310,11 @@ export const getServicesByStyliste = async (stylisteId) => {
       where("stylistesIds", "array-contains", stylisteId),
       where("actif", "==", true)
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
   } catch (error) {
     console.error("Erreur récupération services par styliste:", error);
@@ -315,36 +326,39 @@ export const getServicesByStyliste = async (stylisteId) => {
 export const getServicesStats = async () => {
   try {
     const services = await getAllServices();
-    const activeServices = services.filter(s => s.actif !== false);
-    
+    const activeServices = services.filter((s) => s.actif !== false);
+
     let totalServices = activeServices.length;
     let categories = {};
     let totalValeur = 0;
-    
+
     for (const service of activeServices) {
       totalValeur += service.prix || 0;
-      
-      const categorie = service.categorie || 'Non catégorisé';
+
+      const categorie = service.categorie || "Non catégorisé";
       if (!categories[categorie]) {
         categories[categorie] = {
           count: 0,
-          totalValue: 0
+          totalValue: 0,
         };
       }
       categories[categorie].count++;
       categories[categorie].totalValue += service.prix || 0;
     }
-    
+
     const categoriesArray = Object.entries(categories).map(([name, stats]) => ({
       name,
-      ...stats
+      ...stats,
     }));
-    
+
     return {
       totalServices,
       totalValeur: parseFloat(totalValeur.toFixed(2)),
       categories: categoriesArray,
-      averagePrice: totalServices > 0 ? parseFloat((totalValeur / totalServices).toFixed(2)) : 0
+      averagePrice:
+        totalServices > 0
+          ? parseFloat((totalValeur / totalServices).toFixed(2))
+          : 0,
     };
   } catch (error) {
     console.error("Erreur calcul statistiques services:", error);
@@ -360,19 +374,19 @@ export const serviceService = {
   getServiceById,
   updateService,
   deleteService,
-  
+
   // Récupération des données associées
   getProductsByIds,
   getStylistesByIds,
   getAllStylistes,
-  
+
   // Recherche et filtres
   searchServices,
   getServicesByCategory,
   getServicesByStyliste,
-  
+
   // Statistiques
-  getServicesStats
+  getServicesStats,
 };
 
 export default serviceService;

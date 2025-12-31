@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: "#fff",
-    paddingTop: 40,
+    paddingTop: 45,
     paddingBottom: 20,
     flexDirection: "row",
     alignItems: "center",

@@ -531,13 +531,15 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
               <Text style={styles.sectionTitle}>Avis clients</Text>
               <Text style={styles.reviewsCount}>({reviews.length} avis)</Text>
             </View>
-            <TouchableOpacity
-              style={styles.addReviewButton}
-              onPress={() => setReviewModalVisible(true)}
-            >
-              <Ionicons name="add-circle-outline" size={22} color="#FF6B6B" />
-              <Text style={styles.addReviewText}>Ajouter un avis</Text>
-            </TouchableOpacity>
+            {userData?.role === "client" && (
+              <TouchableOpacity
+                style={styles.addReviewButton}
+                onPress={() => setReviewModalVisible(true)}
+              >
+                <Ionicons name="add-circle-outline" size={22} color="#FF6B6B" />
+                <Text style={styles.addReviewText}>Ajouter un avis</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {reviews.length > 0 ? (
@@ -560,15 +562,17 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
       </ScrollView>
 
       {/* Bouton de réservation fixe */}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.bookButton}
-          onPress={handleBookAppointment}
-        >
-          <Ionicons name="calendar" size={24} color="white" />
-          <Text style={styles.bookButtonText}>Prendre rendez-vous</Text>
-        </TouchableOpacity>
-      </View>
+      {userData?.role === "client" && (
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.bookButton}
+            onPress={handleBookAppointment}
+          >
+            <Ionicons name="calendar" size={24} color="white" />
+            <Text style={styles.bookButtonText}>Prendre rendez-vous</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Modal pour ajouter un avis */}
       <Modal

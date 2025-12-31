@@ -20,14 +20,6 @@ const CoiffeurManagement = ({ navigation }) => {
       color: "#4CAF50",
     },
     {
-      title: "Liste des Stylistes",
-      description: "Voir et gérer tous les stylistes",
-      screen: "StylisteList", // Changé de CoiffeurList à StylisteList
-      icon: "people",
-      color: "#2196F3",
-    },
-
-    {
       title: "Affecter Spécialités",
       description: "Assigner des spécialités aux stylistes",
       screen: "StylisteList",

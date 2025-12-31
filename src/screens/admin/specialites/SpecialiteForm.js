@@ -13,11 +13,12 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 // En haut du fichier SpecialiteList.js et SpecialiteForm.js
-import { 
+import {
   createSpecialite,
   updateSpecialite,
-  checkUniqueName
-} from '../../../services/specialiteService';
+  checkUniqueName,
+  getSpecialiteById,
+} from "../../../services/specialiteService";
 const SpecialiteForm = ({ navigation, route }) => {
   const { specialiteId } = route.params || {};
   const [loading, setLoading] = useState(false);
@@ -37,7 +38,7 @@ const SpecialiteForm = ({ navigation, route }) => {
   const loadSpecialite = async () => {
     try {
       setLoading(true);
-      const specialite = await specialiteService.getById(specialiteId);
+      const specialite = await getSpecialiteById(specialiteId); // Utiliser la fonction importée
       setNom(specialite.nom);
       setDescription(specialite.description || "");
     } catch (error) {
@@ -49,6 +50,7 @@ const SpecialiteForm = ({ navigation, route }) => {
   };
 
   // Remplacer validateForm :
+  // Modifier la fonction validateForm (ligne ~56) :
   const validateForm = async () => {
     const newErrors = {};
 
@@ -58,15 +60,18 @@ const SpecialiteForm = ({ navigation, route }) => {
       newErrors.nom = "Le nom doit contenir au moins 2 caractères";
     } else {
       try {
-        // Utiliser la fonction checkUniqueName
-        const isUnique = await checkUniqueName(
-          nom.trim(),
-          isEditMode ? specialiteId : null
-        );
-        if (!isUnique) {
-          newErrors.nom = "Ce nom de spécialité existe déjà";
+        // Ajouter un indicateur de vérification
+        if (nom.trim().length >= 2) {
+          const isUnique = await checkUniqueName(
+            nom.trim(),
+            isEditMode ? specialiteId : null
+          );
+          if (!isUnique) {
+            newErrors.nom = "Ce nom de spécialité existe déjà";
+          }
         }
       } catch (error) {
+        console.error("Erreur vérification:", error);
         newErrors.nom = "Erreur de vérification du nom";
       }
     }
