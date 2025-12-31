@@ -1,4 +1,3 @@
-// services/productService.js
 import {
   collection,
   doc,
@@ -15,12 +14,10 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
-// ============ CATÉGORIES ============
 const CATEGORIES_COLLECTION = "categories";
 const PRODUCTS_COLLECTION = "products";
 const SUPPLIERS_COLLECTION = "suppliers";
 
-// === CATÉGORIES ===
 export const getAllCategories = async () => {
   try {
     const categoriesRef = collection(db, CATEGORIES_COLLECTION);
@@ -58,7 +55,6 @@ export const getCategoryById = async (categoryId) => {
 
 export const deleteCategory = async (categoryId) => {
   try {
-    // Vérifier si la catégorie a des produits
     const products = await getProductsByCategory(categoryId);
     if (products.length > 0) {
       throw new Error(
@@ -74,38 +70,7 @@ export const deleteCategory = async (categoryId) => {
   }
 };
 
-// export const checkUniqueCategoryName = async (nom, excludeId = null) => {
-//   try {
-//     const categoriesRef = collection(db, CATEGORIES_COLLECTION);
-//     const nomLower = nom.trim().toLowerCase();
 
-//     const q = query(
-//       categoriesRef,
-//       where("nom", ">=", nomLower),
-//       where("nom", "<=", nomLower + "\uf8ff")
-//     );
-
-//     const snapshot = await getDocs(q);
-
-//     const existingCategories = snapshot.docs
-//       .filter(doc => excludeId ? doc.id !== excludeId : true)
-//       .filter(doc => {
-//         const data = doc.data();
-//         return data.actif !== false &&
-//                data.nom.toLowerCase() === nomLower;
-//       });
-
-//     return existingCategories.length === 0;
-//   } catch (error) {
-//     console.error("Erreur vérification nom catégorie:", error);
-//     throw error;
-//   }
-// };
-
-// === FOURNISSEURS ===
-
-// services/productService.js - CORRECTION
-// Version alternative - plus lente mais sans champ supplémentaire
 export const checkUniqueCategoryName = async (nom, excludeId = null) => {
   try {
     const categoriesRef = collection(db, CATEGORIES_COLLECTION);
@@ -118,7 +83,6 @@ export const checkUniqueCategoryName = async (nom, excludeId = null) => {
       const data = doc.data();
       const dataNomLower = data.nom?.trim().toLowerCase() || "";
 
-      // Vérifier l'égalité insensible à la casse
       const sameName = dataNomLower === nomLower;
       const sameId = excludeId ? doc.id === excludeId : false;
 
@@ -132,10 +96,8 @@ export const checkUniqueCategoryName = async (nom, excludeId = null) => {
   }
 };
 
-// MODIFIEZ AUSSI createCategory et updateCategory :
 export const createCategory = async (categoryData) => {
   try {
-    // Vérifier si la catégorie existe déjà
     const isUnique = await checkUniqueCategoryName(categoryData.nom);
     if (!isUnique) {
       throw new Error("Cette catégorie existe déjà");
@@ -145,7 +107,7 @@ export const createCategory = async (categoryData) => {
 
     const categoryDoc = {
       nom: categoryData.nom.trim(),
-      nom_lower: nomLower, // AJOUTER CE CHAMP
+      nom_lower: nomLower, 
       description: categoryData.description?.trim() || "",
       dateCreation: serverTimestamp(),
       dateModification: serverTimestamp(),
@@ -168,7 +130,6 @@ export const createCategory = async (categoryData) => {
 
 export const updateCategory = async (categoryId, categoryData) => {
   try {
-    // Vérifier si le nom est unique
     const isUnique = await checkUniqueCategoryName(
       categoryData.nom,
       categoryId
@@ -181,7 +142,7 @@ export const updateCategory = async (categoryId, categoryData) => {
 
     const dataToUpdate = {
       nom: categoryData.nom.trim(),
-      nom_lower: nomLower, // AJOUTER CE CHAMP
+      nom_lower: nomLower, 
       description: categoryData.description?.trim() || "",
       dateModification: serverTimestamp(),
     };
@@ -212,7 +173,6 @@ export const getAllSuppliers = async () => {
 
 export const createSupplier = async (supplierData) => {
   try {
-    // Vérifier si le fournisseur existe déjà
     const exists = await checkSupplierExists(
       supplierData.nom,
       supplierData.email
@@ -253,7 +213,6 @@ export const checkSupplierExists = async (nom, email) => {
     const snapshot = await getDocs(q);
     if (!snapshot.empty) return true;
 
-    // Vérifier aussi par email
     const q2 = query(suppliersRef, where("email", "==", email.trim()));
 
     const snapshot2 = await getDocs(q2);
@@ -281,16 +240,13 @@ export const getSupplierById = async (supplierId) => {
   }
 };
 
-// Mettre à jour un fournisseur
 export const updateSupplier = async (supplierId, supplierData) => {
   try {
-    // Vérifier si le nom/email sont uniques (sauf pour l'actuel)
     const supplier = await getSupplierById(supplierId);
     if (!supplier) {
       throw new Error("Fournisseur non trouvé");
     }
 
-    // Vérifier si le nom a changé
     if (supplierData.nom !== supplier.nom) {
       const exists = await checkSupplierExists(supplierData.nom, "");
       if (exists) {
@@ -298,7 +254,6 @@ export const updateSupplier = async (supplierId, supplierData) => {
       }
     }
 
-    // Vérifier si l'email a changé
     if (supplierData.email !== supplier.email) {
       const exists = await checkSupplierExists("", supplierData.email);
       if (exists) {
@@ -323,12 +278,8 @@ export const updateSupplier = async (supplierId, supplierData) => {
   }
 };
 
-// Supprimer un fournisseur
 export const deleteSupplier = async (supplierId) => {
   try {
-    // Vérifier si le fournisseur a des produits
-    // Vous devrez peut-être créer getProductsBySupplier
-    // Pour l'instant, on supprime sans vérification
     await deleteDoc(doc(db, SUPPLIERS_COLLECTION, supplierId));
     console.log("Fournisseur supprimé :", supplierId);
     return supplierId;
@@ -338,10 +289,8 @@ export const deleteSupplier = async (supplierId) => {
   }
 };
 
-// === PRODUITS ===
 export const createProduct = async (productData) => {
   try {
-    // Vérifier si le code produit est unique
     if (productData.code) {
       const exists = await checkProductCodeExists(productData.code);
       if (exists) {
@@ -361,12 +310,9 @@ export const createProduct = async (productData) => {
       categorieNom: productData.categorieNom,
       fournisseurId: productData.fournisseurId,
       fournisseurNom: productData.fournisseurNom,
-      // AJOUTEZ CES LIGNES :
-      imageUrl: productData.imageUrl || null, // URL Cloudinary
-      imagePublicId: productData.imagePublicId || null, // Optionnel
-      // Supprimez ou gardez pour compatibilité :
-      localImagePath: null, // Définir à null
-      // FIN AJOUT
+      imageUrl: productData.imageUrl || null, 
+      imagePublicId: productData.imagePublicId || null, 
+      localImagePath: null,
       dateCreation: serverTimestamp(),
       dateModification: serverTimestamp(),
       actif: true,
@@ -375,10 +321,8 @@ export const createProduct = async (productData) => {
     const newDocRef = doc(collection(db, PRODUCTS_COLLECTION));
     await setDoc(newDocRef, productDoc);
 
-    // Mettre à jour le compteur de produits dans la catégorie
     await updateCategoryProductCount(productData.categorieId, 1);
 
-    // Mettre à jour le compteur de produits dans le fournisseur
     await updateSupplierProductCount(productData.fournisseurId, 1);
 
     return {
@@ -479,9 +423,7 @@ export const updateSupplierProductCount = async (supplierId, increment) => {
   }
 };
 
-// services/productService.js - Ajoutez ces fonctions :
 
-// === PRODUITS (Fonctions supplémentaires) ===
 export const getProductById = async (productId) => {
   try {
     const productDoc = await getDoc(doc(db, PRODUCTS_COLLECTION, productId));
@@ -491,7 +433,6 @@ export const getProductById = async (productId) => {
       return {
         id: productDoc.id,
         ...data,
-        // Assurer la compatibilité avec l'ancien système
         imageUrl: data.imageUrl || data.localImagePath || null,
       };
     }
@@ -504,13 +445,11 @@ export const getProductById = async (productId) => {
 
 export const updateProduct = async (productId, productData) => {
   try {
-    // Récupérer le produit existant
     const existingProduct = await getProductById(productId);
     if (!existingProduct) {
       throw new Error("Produit non trouvé");
     }
 
-    // Vérifier si le code a changé et s'il est unique
     if (productData.code && productData.code !== existingProduct.code) {
       const exists = await checkProductCodeExists(productData.code);
       if (exists) {
@@ -518,19 +457,13 @@ export const updateProduct = async (productId, productData) => {
       }
     }
 
-    // Mettre à jour les compteurs si la catégorie change
     if (productData.categorieId !== existingProduct.categorieId) {
-      // Décrémenter l'ancienne catégorie
       await updateCategoryProductCount(existingProduct.categorieId, -1);
-      // Incrémenter la nouvelle catégorie
       await updateCategoryProductCount(productData.categorieId, 1);
     }
 
-    // Mettre à jour les compteurs si le fournisseur change
     if (productData.fournisseurId !== existingProduct.fournisseurId) {
-      // Décrémenter l'ancien fournisseur
       await updateSupplierProductCount(existingProduct.fournisseurId, -1);
-      // Incrémenter le nouveau fournisseur
       await updateSupplierProductCount(productData.fournisseurId, 1);
     }
 
@@ -549,14 +482,11 @@ export const updateProduct = async (productId, productData) => {
       dateModification: serverTimestamp(),
     };
 
-    // AJOUTEZ CETTE SECTION POUR L'IMAGE :
     if (productData.imageUrl) {
       dataToUpdate.imageUrl = productData.imageUrl;
       dataToUpdate.imagePublicId = productData.imagePublicId || null;
-      // Si on a une nouvelle image, supprimer l'ancien chemin local
       dataToUpdate.localImagePath = null;
     } else if (productData.imageUrl === null) {
-      // Si imageUrl est explicitement null, supprimer l'image
       dataToUpdate.imageUrl = null;
       dataToUpdate.imagePublicId = null;
     }
@@ -571,17 +501,14 @@ export const updateProduct = async (productId, productData) => {
 
 export const deleteProduct = async (productId) => {
   try {
-    // Récupérer le produit avant suppression
     const product = await getProductById(productId);
     if (!product) {
       throw new Error("Produit non trouvé");
     }
 
-    // Mettre à jour les compteurs
     await updateCategoryProductCount(product.categorieId, -1);
     await updateSupplierProductCount(product.fournisseurId, -1);
 
-    // Supprimer le produit (soft delete)
     await updateDoc(doc(db, PRODUCTS_COLLECTION, productId), {
       actif: false,
       dateModification: serverTimestamp(),
@@ -594,7 +521,6 @@ export const deleteProduct = async (productId) => {
   }
 };
 
-// Récupérer les produits avec filtres
 export const searchProducts = async (searchTerm) => {
   try {
     const allProducts = await getAllProducts();
@@ -611,7 +537,6 @@ export const searchProducts = async (searchTerm) => {
   }
 };
 
-// Produits en rupture de stock
 export const getLowStockProducts = async () => {
   try {
     const allProducts = await getAllProducts();
@@ -625,7 +550,6 @@ export const getLowStockProducts = async () => {
   }
 };
 
-// Mettre à jour la quantité d'un produit
 export const updateProductQuantity = async (productId, newQuantity) => {
   try {
     const quantity = parseInt(newQuantity) || 0;
@@ -666,7 +590,6 @@ export const getInventoryStats = async () => {
         lowStockCount++;
       }
 
-      // Stats par catégorie
       const categorie = product.categorieNom || "Non catégorisé";
       if (!categoriesStats[categorie]) {
         categoriesStats[categorie] = {
@@ -706,11 +629,8 @@ export const getInventoryStats = async () => {
   }
 };
 
-// Obtenir l'historique des mouvements de stock (à implémenter avec une collection séparée)
 export const getStockMovements = async (limit = 50) => {
   try {
-    // Vous pouvez créer une collection "stock_movements" plus tard
-    // Pour l'instant, retournons un exemple
     return [];
   } catch (error) {
     console.error("Erreur récupération mouvements:", error);
@@ -718,7 +638,6 @@ export const getStockMovements = async (limit = 50) => {
   }
 };
 
-// Obtenir les produits par niveau de stock
 export const getProductsByStockLevel = async (level = "all") => {
   try {
     const allProducts = await getAllProducts();
@@ -742,10 +661,8 @@ export const getProductsByStockLevel = async (level = "all") => {
   }
 };
 
-// Ajouter un mouvement de stock
 export const addStockMovement = async (movementData) => {
   try {
-    // Vous pouvez créer une collection "stock_movements" plus tard
     console.log("Mouvement de stock:", movementData);
     return movementData;
   } catch (error) {
@@ -753,9 +670,7 @@ export const addStockMovement = async (movementData) => {
     throw error;
   }
 };
-// Service complet
 export const productService = {
-  // Catégories
   getAllCategories,
   getCategoryById,
   createCategory,
@@ -763,7 +678,6 @@ export const productService = {
   deleteCategory,
   checkUniqueCategoryName,
 
-  // Fournisseurs
   getAllSuppliers,
   createSupplier,
   checkSupplierExists,
@@ -771,7 +685,6 @@ export const productService = {
   updateSupplier,
   deleteSupplier,
 
-  // Produits
   createProduct,
   getAllProducts,
   getProductsByCategory,
@@ -784,7 +697,6 @@ export const productService = {
   getProductsByStockLevel,
   addStockMovement,
 
-  // Utilitaires
   updateCategoryProductCount,
   updateSupplierProductCount,
 };

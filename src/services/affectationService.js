@@ -1,4 +1,3 @@
-// services/affectationService.js
 import { 
   collection, 
   doc, 
@@ -16,7 +15,6 @@ import { incrementCoiffeurCount, decrementCoiffeurCount } from './specialiteServ
 
 const COLLECTION_NAME = "coiffeur_specialites";
 
-// Récupérer toutes les affectations d'un styliste (utilise uid)
 export const getSpecialitesByStyliste = async (stylisteUid) => {
   try {
     const affectationsCollection = collection(db, COLLECTION_NAME);
@@ -36,16 +34,13 @@ export const getSpecialitesByStyliste = async (stylisteUid) => {
   }
 };
 
-// Ajouter une affectation
 export const addAffectation = async (stylisteUid, specialiteId) => {
   try {
-    // Vérifier si l'affectation existe déjà
     const exists = await checkAffectationExists(stylisteUid, specialiteId);
     if (exists) {
       throw new Error("Cette affectation existe déjà");
     }
 
-    // Créer l'affectation
     const affectationDoc = {
       stylisteUid,
       specialiteId,
@@ -53,13 +48,10 @@ export const addAffectation = async (stylisteUid, specialiteId) => {
       actif: true
     };
 
-    // Créer une référence de document
     const newDocRef = doc(collection(db, COLLECTION_NAME));
     
-    // Sauvegarder dans Firestore
     await setDoc(newDocRef, affectationDoc);
     
-    // Incrémenter le compteur de coiffeurs dans la spécialité
     await incrementCoiffeurCount(specialiteId);
     
     console.log("Affectation créée avec ID :", newDocRef.id);
@@ -73,7 +65,6 @@ export const addAffectation = async (stylisteUid, specialiteId) => {
   }
 };
 
-// Vérifier si une affectation existe
 export const checkAffectationExists = async (stylisteUid, specialiteId) => {
   try {
     const affectationsCollection = collection(db, COLLECTION_NAME);
@@ -91,13 +82,10 @@ export const checkAffectationExists = async (stylisteUid, specialiteId) => {
   }
 };
 
-// Supprimer une affectation
 export const removeAffectation = async (affectationId, specialiteId) => {
   try {
-    // Supprimer l'affectation
     await deleteDoc(doc(db, COLLECTION_NAME, affectationId));
     
-    // Décrémenter le compteur de coiffeurs dans la spécialité
     await decrementCoiffeurCount(specialiteId);
     
     console.log("Affectation supprimée :", affectationId);
@@ -108,15 +96,12 @@ export const removeAffectation = async (affectationId, specialiteId) => {
   }
 };
 
-// Mettre à jour plusieurs affectations pour un styliste
 export const updateStylisteSpecialites = async (stylisteUid, specialiteIds) => {
   try {
     const batch = writeBatch(db);
     
-    // Récupérer les affectations existantes
     const existingAffectations = await getSpecialitesByStyliste(stylisteUid);
     
-    // Supprimer les affectations qui ne sont plus dans la nouvelle liste
     const affectationsToRemove = existingAffectations.filter(
       affectation => !specialiteIds.includes(affectation.specialiteId)
     );
@@ -126,7 +111,6 @@ export const updateStylisteSpecialites = async (stylisteUid, specialiteIds) => {
       await decrementCoiffeurCount(affectation.specialiteId);
     }
     
-    // Ajouter les nouvelles affectations
     const existingSpecialiteIds = existingAffectations.map(a => a.specialiteId);
     const specialitesToAdd = specialiteIds.filter(
       specialiteId => !existingSpecialiteIds.includes(specialiteId)
@@ -144,7 +128,6 @@ export const updateStylisteSpecialites = async (stylisteUid, specialiteIds) => {
       await incrementCoiffeurCount(specialiteId);
     }
     
-    // Exécuter le batch
     await batch.commit();
     
     console.log(`Affectations mises à jour pour styliste ${stylisteUid}`);
@@ -155,7 +138,6 @@ export const updateStylisteSpecialites = async (stylisteUid, specialiteIds) => {
   }
 };
 
-// Récupérer les spécialités avec info d'affectation pour un styliste
 export const getSpecialitesWithAffectation = async (stylisteUid) => {
   try {
     const [specialites, affectations] = await Promise.all([

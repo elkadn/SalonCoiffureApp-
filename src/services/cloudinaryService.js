@@ -1,11 +1,9 @@
 import { Platform } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 
-// Configuration Cloudinary - Remplacez par vos credentials
 const CLOUD_NAME = "dsxlslezn";
 const UPLOAD_PRESET = "salon_app";
 
-// URL de base pour l'upload
 const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
 
 const generateUniqueId = () => {
@@ -21,18 +19,15 @@ export const uploadToCloudinary = async (imageUri, folder = "salon_logos") => {
     console.log("☁️ Cloud name:", CLOUD_NAME);
     console.log("⚙️ Upload preset:", UPLOAD_PRESET);
 
-    // Vérifications simples
     if (!CLOUD_NAME) {
       throw new Error("CLOUD_NAME non configuré");
     }
     if (!UPLOAD_PRESET) {
-      // SIMPLIFIÉ : juste vérifier si défini
       throw new Error("UPLOAD_PRESET non configuré");
     }
 
     const fileName = generateUniqueId();
 
-    // Créer FormData
     const formData = new FormData();
     formData.append("file", {
       uri: imageUri,
@@ -46,7 +41,6 @@ export const uploadToCloudinary = async (imageUri, folder = "salon_logos") => {
 
     console.log("📋 FormData créé, envoi vers Cloudinary...");
 
-    // Upload
     const response = await fetch(CLOUDINARY_UPLOAD_URL, {
       method: "POST",
       body: formData,
@@ -67,7 +61,7 @@ export const uploadToCloudinary = async (imageUri, folder = "salon_logos") => {
           throw new Error(`Cloudinary: ${errorData.error.message}`);
         }
       } catch (parseError) {
-        // Ignorer si pas JSON
+        console.error("❌ Erreur parsing réponse Cloudinary:", parseError);
       }
 
       throw new Error(`Échec upload: ${response.status}`);
@@ -113,7 +107,6 @@ export const uploadServiceImage = async (imageUri, serviceName = "service") => {
   try {
     console.log(`📤 Upload image service: ${serviceName}`);
 
-    // Générer un nom unique avec le nom du service
     const timestamp = Date.now().toString(36);
     const randomPart = Math.random().toString(36).substring(2, 9);
     const fileName = `service_${serviceName.replace(
@@ -128,7 +121,7 @@ export const uploadServiceImage = async (imageUri, serviceName = "service") => {
       name: `${fileName}.jpg`,
     });
     formData.append("upload_preset", UPLOAD_PRESET);
-    formData.append("folder", "service_images"); // Dossier spécifique
+    formData.append("folder", "service_images"); 
     formData.append("public_id", fileName);
     formData.append("tags", `service,${serviceName}`);
 
@@ -164,8 +157,7 @@ export const pickImage = async () => {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"], // NOUVEAU FORMAT
-      // ou mediaTypes: ImagePicker.MediaType.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -182,12 +174,10 @@ export const pickImage = async () => {
   }
 };
 
-// Ajoutez cette fonction à cloudinaryService.js
 export const uploadProductImage = async (imageUri, productName = "product") => {
   try {
     console.log(`📤 Upload image produit: ${productName}`);
 
-    // Générer un nom unique avec le nom du produit
     const timestamp = Date.now().toString(36);
     const randomPart = Math.random().toString(36).substring(2, 9);
     const fileName = `product_${productName
@@ -201,7 +191,7 @@ export const uploadProductImage = async (imageUri, productName = "product") => {
       name: `${fileName}.jpg`,
     });
     formData.append("upload_preset", UPLOAD_PRESET);
-    formData.append("folder", "product_images"); // Dossier spécifique
+    formData.append("folder", "product_images");
     formData.append("public_id", fileName);
     formData.append("tags", `product,${productName}`);
 

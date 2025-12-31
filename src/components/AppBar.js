@@ -1,4 +1,3 @@
-// components/AppBar.js - VERSION DYNAMIQUE
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -31,9 +30,8 @@ export const AppBar = ({
       const info = await salonService.getSalonInfo();
       setSalonInfo(info);
 
-      // Priorité à logoUrl (Cloudinary), fallback à logoPath (ancien système)
       if (info.logoUrl) {
-        setLogoUri(info.logoUrl); // URL Cloudinary directe
+        setLogoUri(info.logoUrl); 
       } else if (info.logoPath) {
         setLogoUri(info.logoPath);
       }
@@ -53,20 +51,18 @@ export const AppBar = ({
   return (
     <View style={styles.appBarContainer}>
       <View style={styles.appBar}>
-        {/* Bouton Menu à gauche */}
         {showMenuButton && (
           <TouchableOpacity style={styles.menuButton} onPress={handleMenuPress}>
             <Text style={styles.menuIcon}>☰</Text>
           </TouchableOpacity>
         )}
 
-        {/* Logo/Titre au centre */}
         <View style={styles.logoContainer}>
           {showLogo && logoUri ? (
             <Image
               source={{ uri: logoUri }}
               style={styles.logoImage}
-              onError={() => setLogoUri(null)} // Fallback si erreur
+              onError={() => setLogoUri(null)} 
             />
           ) : (
             <Text style={styles.title} numberOfLines={1}>
@@ -75,7 +71,6 @@ export const AppBar = ({
           )}
         </View>
 
-        {/* Badge utilisateur à droite */}
         {currentUser && (
           <View style={styles.rightSection}>
             <View style={styles.userBadge}>

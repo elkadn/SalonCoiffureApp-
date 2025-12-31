@@ -1,4 +1,3 @@
-// Dans services/creneauService.js
 import { 
   collection, 
   doc, 
@@ -15,30 +14,23 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 
-// Récupérer tous les créneaux d'un styliste
-// Dans services/creneauService.js - Modifie cette fonction
 export const getStylisteCreneaux = async (stylisteId) => {
   try {
     const creneauxCollection = collection(db, "creneaux");
     const q = query(
       creneauxCollection,
       where("stylisteId", "==", stylisteId)
-      // Retire temporairement les orderBy
-      // orderBy("jour"),
-      // orderBy("heureDebut")
+  
     );
     
     const snapshot = await getDocs(q);
     
-    // Trie manuellement côté client
     const creneaux = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
     
-    // Trie par jour puis par heure
     return creneaux.sort((a, b) => {
-      // Trie par jour de la semaine
       const joursOrdre = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
       const jourA = joursOrdre.indexOf(a.jour);
       const jourB = joursOrdre.indexOf(b.jour);
@@ -47,19 +39,16 @@ export const getStylisteCreneaux = async (stylisteId) => {
         return jourA - jourB;
       }
       
-      // Si même jour, trie par heure de début
       return a.heureDebut.localeCompare(b.heureDebut);
     });
     
   } catch (error) {
     console.error("Erreur récupération des créneaux:", error);
-    // Ajoute un log plus détaillé
     console.error("Détails erreur:", error.message, error.code);
     throw error;
   }
 };
 
-// Récupérer un créneau par ID
 export const getCreneauById = async (creneauId) => {
   try {
     const creneauDoc = await getDoc(doc(db, "creneaux", creneauId));
@@ -77,13 +66,10 @@ export const getCreneauById = async (creneauId) => {
   }
 };
 
-// Créer un nouveau créneau
 export const addCreneau = async (creneauData) => {
   try {
-    // Générer un ID unique
     const creneauId = `${creneauData.stylisteId}_${creneauData.jour}_${Date.now()}`;
     
-    // Convertir les heures en format standard
     const heureDebut = creneauData.heureDebut.includes(':') 
       ? creneauData.heureDebut 
       : `${creneauData.heureDebut}:00`;
@@ -100,7 +86,6 @@ export const addCreneau = async (creneauData) => {
       dateModification: serverTimestamp()
     };
     
-    // Ajouter dans Firestore
     await setDoc(doc(db, "creneaux", creneauId), creneauDoc);
     
     console.log("Créneau créé avec ID :", creneauId);
@@ -115,10 +100,8 @@ export const addCreneau = async (creneauData) => {
   }
 };
 
-// Mettre à jour un créneau
 export const updateCreneau = async (creneauId, creneauData) => {
   try {
-    // Convertir les heures si nécessaire
     const updateData = { ...creneauData };
     
     if (creneauData.heureDebut && !creneauData.heureDebut.includes(':')) {
@@ -145,7 +128,6 @@ export const updateCreneau = async (creneauId, creneauData) => {
   }
 };
 
-// Supprimer un créneau
 export const deleteCreneau = async (creneauId) => {
   try {
     await deleteDoc(doc(db, "creneaux", creneauId));
@@ -161,7 +143,6 @@ export const deleteCreneau = async (creneauId) => {
   }
 };
 
-// Récupérer les créneaux disponibles pour un jour spécifique
 export const getCreneauxDisponibles = async (stylisteId, jour, date) => {
   try {
     const creneauxCollection = collection(db, "creneaux");
@@ -175,8 +156,7 @@ export const getCreneauxDisponibles = async (stylisteId, jour, date) => {
     
     const snapshot = await getDocs(q);
     
-    // Ici tu pourrais ajouter la logique pour filtrer les créneaux déjà réservés
-    // en consultant une collection "rendezvous"
+  
     
     return snapshot.docs.map(doc => ({
       id: doc.id,
@@ -188,7 +168,6 @@ export const getCreneauxDisponibles = async (stylisteId, jour, date) => {
   }
 };
 
-// Récupérer tous les créneaux de tous les stylistes (pour l'admin)
 export const getAllCreneaux = async () => {
   try {
     const creneauxCollection = collection(db, "creneaux");
@@ -210,7 +189,6 @@ export const getAllCreneaux = async () => {
   }
 };
 
-// Vérifier si un créneau existe déjà pour un styliste à un jour/heure donné
 export const checkCreneauExists = async (stylisteId, jour, heureDebut, heureFin, excludeCreneauId = null) => {
   try {
     const creneauxCollection = collection(db, "creneaux");
@@ -227,15 +205,12 @@ export const checkCreneauExists = async (stylisteId, jour, heureDebut, heureFin,
       ...doc.data()
     }));
     
-    // Vérifier les chevauchements
     const chevauchements = creneaux.filter(creneau => {
-      // Exclure le créneau en cours d'édition
       if (excludeCreneauId && creneau.id === excludeCreneauId) return false;
       
       const debutExist = creneau.heureDebut;
       const finExist = creneau.heureFin;
       
-      // Vérifier si les créneaux se chevauchent
       return (heureDebut < finExist && heureFin > debutExist);
     });
     
@@ -249,7 +224,6 @@ export const checkCreneauExists = async (stylisteId, jour, heureDebut, heureFin,
   }
 };
 
-// Mettre à jour le statut d'un créneau (actif/inactif)
 export const toggleCreneauStatus = async (creneauId, actif) => {
   try {
     await updateDoc(doc(db, "creneaux", creneauId), {

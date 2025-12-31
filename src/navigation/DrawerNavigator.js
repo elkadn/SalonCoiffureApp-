@@ -11,7 +11,6 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuth } from "../context/AuthContext";
 
-// Importez TOUS vos écrans
 import HomeScreen from "../screens/HomeScreen";
 import LoginScreen from "../screens/auth/LoginScreen";
 import DashboardScreen from "../screens/admin/DashboardScreen";
@@ -84,7 +83,6 @@ export const CustomDrawer = ({ navigation, drawerVisible, closeDrawer }) => {
     }
   };
 
-  // Modifiez la const menuItems dans CustomDrawer :
 
   const menuItems = [
     { label: "Accueil", screen: "Home", icon: "🏠" },
@@ -195,7 +193,6 @@ export const CustomDrawer = ({ navigation, drawerVisible, closeDrawer }) => {
       onRequestClose={closeDrawer}
     >
       <View style={styles.modalContainer}>
-        {/* DRAWER À GAUCHE */}
         <View style={styles.drawerContent}>
           <View style={styles.drawerHeader}>
             <View style={styles.headerTop}>
@@ -251,7 +248,6 @@ export const CustomDrawer = ({ navigation, drawerVisible, closeDrawer }) => {
               </TouchableOpacity>
             ))}
 
-            {/* Informations de contact en bas */}
             {(salonInfo?.telephone || salonInfo?.adresse) && (
               <View style={styles.footerInfo}>
                 {salonInfo.telephone && (
@@ -270,7 +266,6 @@ export const CustomDrawer = ({ navigation, drawerVisible, closeDrawer }) => {
           </ScrollView>
         </View>
 
-        {/* Overlay à droite */}
         <TouchableOpacity
           style={styles.overlay}
           activeOpacity={1}
@@ -294,7 +289,6 @@ export const withDrawer = (Component, options = {}) => {
   );
 };
 
-// Navigateur principal
 const DrawerNavigator = () => {
   return (
     <Stack.Navigator
@@ -303,21 +297,18 @@ const DrawerNavigator = () => {
         headerShown: false,
       }}
     >
-      {/* Home avec drawer */}
       <Stack.Screen name="Home">
         {(props) => {
           const HomeWithDrawer = withDrawer(HomeScreen);
           return <HomeWithDrawer {...props} />;
         }}
       </Stack.Screen>
-      {/* Login avec drawer */}
       <Stack.Screen name="Login">
         {(props) => {
           const LoginWithDrawer = withDrawer(LoginScreen);
           return <LoginWithDrawer {...props} />;
         }}
       </Stack.Screen>
-      {/* Register avec drawer */}
       <Stack.Screen name="Register">
         {(props) => {
           const RegisterWithDrawer = withDrawer(RegisterScreen);
@@ -335,19 +326,17 @@ const DrawerNavigator = () => {
         {(props) => {
           const SalonSettingsWithDrawer = withDrawer(SalonSettingsScreen, {
             title: "Paramètres du Salon",
-            showAppBar: false, // Car cet écran a son propre header
+            showAppBar: false, 
           });
           return <SalonSettingsWithDrawer {...props} />;
         }}
       </Stack.Screen>
-      {/* Dashboard avec drawer */}
       <Stack.Screen name="Dashboard">
         {(props) => {
           const DashboardWithDrawer = withDrawer(DashboardScreen);
           return <DashboardWithDrawer {...props} />;
         }}
       </Stack.Screen>
-      {/* Tous les autres écrans admin avec drawer */}
       <Stack.Screen name="UserList">
         {(props) => {
           const UserListWithDrawer = withDrawer(UserListScreen);
@@ -378,7 +367,6 @@ const DrawerNavigator = () => {
           return <ProductManagementWithDrawer {...props} />;
         }}
       </Stack.Screen>
-      {/* Ajoutez tous vos autres écrans de la même manière */}
       <Stack.Screen name="StylisteCreneaux">
         {(props) => {
           const StylisteCreneauxWithDrawer = withDrawer(StylisteCreneauxScreen);
@@ -592,7 +580,7 @@ const DrawerNavigator = () => {
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    flexDirection: "row", // Garder row
+    flexDirection: "row", 
   },
   overlay: {
     flex: 1,
@@ -602,7 +590,6 @@ const styles = StyleSheet.create({
     width: 280,
     backgroundColor: "#fff",
     height: "100%",
-    // Pas de changement ici, le drawer sera à gauche car c'est le premier enfant
   },
   drawerHeader: {
     padding: 20,

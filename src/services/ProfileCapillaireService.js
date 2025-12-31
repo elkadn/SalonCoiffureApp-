@@ -1,4 +1,3 @@
-// services/profilCapillaireService.js
 import { 
   collection, 
   doc, 
@@ -12,7 +11,6 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 
-// Récupérer le profil capillaire d'un client
 export const getProfilCapillaireByClientId = async (clientId) => {
   try {
     const profilCollection = collection(db, "profils_capillaires");
@@ -37,10 +35,8 @@ export const getProfilCapillaireByClientId = async (clientId) => {
   }
 };
 
-// Créer ou mettre à jour un profil capillaire
 export const saveProfilCapillaire = async (clientId, profilData) => {
   try {
-    // Vérifier si un profil existe déjà
     const existingProfil = await getProfilCapillaireByClientId(clientId);
     
     const profilDoc = {
@@ -50,11 +46,9 @@ export const saveProfilCapillaire = async (clientId, profilData) => {
     };
     
     if (existingProfil) {
-      // Mettre à jour
       await updateDoc(doc(db, "profils_capillaires", existingProfil.id), profilDoc);
       return { success: true, id: existingProfil.id, message: "Profil mis à jour" };
     } else {
-      // Créer
       const newDocRef = doc(collection(db, "profils_capillaires"));
       profilDoc.dateCreation = serverTimestamp();
       await setDoc(newDocRef, profilDoc);
@@ -66,7 +60,6 @@ export const saveProfilCapillaire = async (clientId, profilData) => {
   }
 };
 
-// Supprimer un profil capillaire
 export const deleteProfilCapillaire = async (profilId) => {
   try {
     await deleteDoc(doc(db, "profils_capillaires", profilId));

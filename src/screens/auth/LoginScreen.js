@@ -46,13 +46,10 @@ const LoginScreen = ({ navigation }) => {
 
     setLoading(true);
     try {
-      // 1. Connexion via Firebase
       const user = await loginUser(email, password);
 
-      // 2. Mettre à jour le contexte Auth avec l'objet utilisateur COMPLET
-      login(user); // user doit contenir toutes les données de Firestore
+      login(user); 
 
-      // 3. Rediriger selon le rôle
       switch (user.role) {
         case "admin":
           navigation.replace("Dashboard");

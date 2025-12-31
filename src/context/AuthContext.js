@@ -27,7 +27,6 @@ export const AuthProvider = ({ children }) => {
         const data = userDoc.data();
         console.log('✅ Données utilisateur chargées:', { uid, role: data.role });
         
-        // Normaliser les timestamps
         const normalizedData = {
           ...data,
           uid,
@@ -63,7 +62,6 @@ export const AuthProvider = ({ children }) => {
     console.log('🚪 Logout context appelé');
     try {
       await signOut(auth);
-      // Les states seront mis à jour par onAuthStateChanged
     } catch (error) {
       console.error('❌ Erreur logout:', error);
     }
@@ -76,17 +74,14 @@ export const AuthProvider = ({ children }) => {
       console.log('🔄 AuthProvider: Auth state changed:', firebaseUser?.uid || 'undefined');
       
       if (firebaseUser) {
-        // Mettre à jour currentUser avec les infos de base de Firebase
         const basicUser = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
         };
         setCurrentUser(basicUser);
         
-        // Charger les données complètes depuis Firestore
         await loadUserData(firebaseUser.uid);
       } else {
-        // Utilisateur déconnecté
         setCurrentUser(null);
         setUserData(null);
       }

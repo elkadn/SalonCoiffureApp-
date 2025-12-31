@@ -1,4 +1,3 @@
-// screens/auth/ForgotPasswordScreen.js - NOUVELLE VERSION
 import React from "react";
 import {
   View,
@@ -12,8 +11,8 @@ import {
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 const ForgotPasswordScreen = ({ navigation }) => {
-  const adminPhone = "+212 6XX-XXXXXX"; // Remplacez par le vrai numéro
-  const adminEmail = "admin@salon-coiffure.com"; // Remplacez par le vrai email
+  const adminPhone = "+212 6XX-XXXXXX"; 
+  const adminEmail = "admin@salon-coiffure.com"; 
 
   const handleCallAdmin = () => {
     Alert.alert(
@@ -96,7 +95,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
         <View style={styles.contactSection}>
           <Text style={styles.contactTitle}>Contactez l'administrateur :</Text>
           
-          {/* Téléphone */}
           <TouchableOpacity style={styles.contactButton} onPress={handleCallAdmin}>
             <View style={[styles.contactIcon, { backgroundColor: "#4CAF50" }]}>
               <Icon name="phone" size={24} color="#fff" />
@@ -108,7 +106,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
             <Icon name="chevron-right" size={24} color="#666" />
           </TouchableOpacity>
 
-          {/* Email */}
           <TouchableOpacity style={styles.contactButton} onPress={handleEmailAdmin}>
             <View style={[styles.contactIcon, { backgroundColor: "#2196F3" }]}>
               <Icon name="email" size={24} color="#fff" />
@@ -120,7 +117,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
             <Icon name="chevron-right" size={24} color="#666" />
           </TouchableOpacity>
 
-          {/* WhatsApp (optionnel) */}
           <TouchableOpacity style={styles.contactButton} onPress={handleWhatsAppAdmin}>
             <View style={[styles.contactIcon, { backgroundColor: "#25D366" }]}>
               <Icon name="chat" size={24} color="#fff" />

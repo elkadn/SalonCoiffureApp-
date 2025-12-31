@@ -1,4 +1,3 @@
-// screens/auth/RegisterScreen.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -34,21 +33,18 @@ const RegisterScreen = ({ navigation }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Validation du nom
     if (!formData.nom.trim()) {
       newErrors.nom = "Le nom est requis";
     } else if (formData.nom.trim().length < 2) {
       newErrors.nom = "Le nom doit contenir au moins 2 caractères";
     }
 
-    // Validation du prénom
     if (!formData.prenom.trim()) {
       newErrors.prenom = "Le prénom est requis";
     } else if (formData.prenom.trim().length < 2) {
       newErrors.prenom = "Le prénom doit contenir au moins 2 caractères";
     }
 
-    // Validation de l'email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
       newErrors.email = "L'email est requis";
@@ -56,7 +52,6 @@ const RegisterScreen = ({ navigation }) => {
       newErrors.email = "Veuillez entrer un email valide";
     }
 
-    // Validation du téléphone
     const phoneRegex = /^0[5-7][0-9]{8}$/;
     if (!formData.telephone.trim()) {
       newErrors.telephone = "Le téléphone est requis";
@@ -65,7 +60,6 @@ const RegisterScreen = ({ navigation }) => {
         "Veuillez entrer un numéro de téléphone valide (ex: 0612345678)";
     }
 
-    // Validation du mot de passe
     if (!formData.password) {
       newErrors.password = "Le mot de passe est requis";
     } else if (formData.password.length < 6) {
@@ -76,7 +70,6 @@ const RegisterScreen = ({ navigation }) => {
         "Le mot de passe doit contenir au moins une majuscule et un chiffre";
     }
 
-    // Validation de la confirmation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Veuillez confirmer votre mot de passe";
     } else if (formData.password !== formData.confirmPassword) {
@@ -95,24 +88,21 @@ const RegisterScreen = ({ navigation }) => {
 
     setLoading(true);
     try {
-      // Données utilisateur pour l'inscription
       const userData = {
         nom: formData.nom.trim(),
         prenom: formData.prenom.trim(),
         telephone: formData.telephone.trim(),
-        role: "client", // Toujours "client" pour les inscriptions
-        pointsFidelite: 0, // Points de fidélité initiaux
+        role: "client", 
+        pointsFidelite: 0, 
         actif: true,
       };
 
-      // Appel au service d'inscription
       const user = await registerUser(
         formData.email.trim(),
         formData.password,
         userData
       );
 
-      // Connexion automatique après inscription
       login(user);
 
       Alert.alert(
@@ -134,7 +124,6 @@ const RegisterScreen = ({ navigation }) => {
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Effacer l'erreur quand l'utilisateur commence à taper
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
@@ -165,7 +154,6 @@ const RegisterScreen = ({ navigation }) => {
         <View style={styles.formContainer}>
           <Text style={styles.formTitle}>Inscription Client</Text>
 
-          {/* Nom */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Nom *</Text>
             <TextInput
@@ -178,7 +166,6 @@ const RegisterScreen = ({ navigation }) => {
             {errors.nom && <Text style={styles.errorText}>{errors.nom}</Text>}
           </View>
 
-          {/* Prénom */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Prénom *</Text>
             <TextInput
@@ -193,7 +180,6 @@ const RegisterScreen = ({ navigation }) => {
             )}
           </View>
 
-          {/* Email */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email *</Text>
             <TextInput
@@ -210,7 +196,6 @@ const RegisterScreen = ({ navigation }) => {
             )}
           </View>
 
-          {/* Téléphone */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Téléphone *</Text>
             <TextInput
@@ -227,7 +212,6 @@ const RegisterScreen = ({ navigation }) => {
             )}
           </View>
 
-          {/* Mot de passe */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Mot de passe *</Text>
             <TextInput
@@ -246,7 +230,6 @@ const RegisterScreen = ({ navigation }) => {
             </Text>
           </View>
 
-          {/* Confirmation mot de passe */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Confirmer le mot de passe *</Text>
             <TextInput
@@ -267,7 +250,6 @@ const RegisterScreen = ({ navigation }) => {
             )}
           </View>
 
-          {/* Bouton d'inscription */}
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleRegister}
@@ -280,7 +262,6 @@ const RegisterScreen = ({ navigation }) => {
             )}
           </TouchableOpacity>
 
-          {/* Lien vers connexion */}
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>Vous avez déjà un compte ? </Text>
             <TouchableOpacity onPress={navigateToLogin}>

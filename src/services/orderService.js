@@ -16,13 +16,10 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 
-// Collections
 const ORDERS_COLLECTION = "orders";
 const ORDER_ITEMS_COLLECTION = "order_items";
 
-// ============ COMMANDES ============
 
-// Créer une nouvelle commande
 export const createOrder = async (orderData) => {
   try {
     const orderDoc = {
@@ -31,7 +28,7 @@ export const createOrder = async (orderData) => {
       orderNumber: orderData.orderNumber || generateOrderNumber(),
       orderDate: serverTimestamp(),
       expectedDeliveryDate: orderData.expectedDeliveryDate || null,
-      status: 'pending', // pending, confirmed, delivered, cancelled
+      status: 'pending', 
       totalAmount: orderData.totalAmount || 0,
       notes: orderData.notes?.trim() || "",
       createdBy: orderData.createdBy || 'admin',
@@ -42,7 +39,6 @@ export const createOrder = async (orderData) => {
     const newOrderRef = doc(collection(db, ORDERS_COLLECTION));
     await setDoc(newOrderRef, orderDoc);
     
-    // Créer les items de commande
     if (orderData.items && orderData.items.length > 0) {
       await createOrderItems(newOrderRef.id, orderData.items);
     }
@@ -57,7 +53,6 @@ export const createOrder = async (orderData) => {
   }
 };
 
-// Créer les items de commande
 const createOrderItems = async (orderId, items) => {
   try {
     const batch = writeBatch(db);
@@ -79,7 +74,6 @@ const createOrderItems = async (orderId, items) => {
     
     await batch.commit();
     
-    // Mettre à jour le montant total
     const totalAmount = items.reduce((sum, item) => {
       return sum + (parseFloat(item.quantity) * parseFloat(item.unitPrice));
     }, 0);
@@ -96,7 +90,6 @@ const createOrderItems = async (orderId, items) => {
   }
 };
 
-// Générer un numéro de commande
 const generateOrderNumber = () => {
   const date = new Date();
   const year = date.getFullYear();
@@ -107,7 +100,6 @@ const generateOrderNumber = () => {
   return `CMD-${year}${month}${day}-${random}`;
 };
 
-// Récupérer toutes les commandes
 export const getAllOrders = async () => {
   try {
     const ordersRef = collection(db, ORDERS_COLLECTION);
@@ -135,7 +127,6 @@ export const getAllOrders = async () => {
   }
 };
 
-// Récupérer les items d'une commande
 export const getOrderItems = async (orderId) => {
   try {
     const itemsRef = collection(db, ORDER_ITEMS_COLLECTION);
@@ -152,7 +143,6 @@ export const getOrderItems = async (orderId) => {
   }
 };
 
-// Récupérer une commande par ID
 export const getOrderById = async (orderId) => {
   try {
     const orderDoc = await getDoc(doc(db, ORDERS_COLLECTION, orderId));
@@ -175,7 +165,6 @@ export const getOrderById = async (orderId) => {
   }
 };
 
-// Récupérer les commandes par fournisseur
 export const getOrdersBySupplier = async (supplierId) => {
   try {
     const ordersRef = collection(db, ORDERS_COLLECTION);
@@ -208,7 +197,6 @@ export const getOrdersBySupplier = async (supplierId) => {
   }
 };
 
-// Mettre à jour le statut d'une commande
 export const updateOrderStatus = async (orderId, status, notes = "") => {
   try {
     const validStatuses = ['pending', 'confirmed', 'delivered', 'cancelled'];
@@ -226,7 +214,6 @@ export const updateOrderStatus = async (orderId, status, notes = "") => {
       updateData.notes = notes;
     }
     
-    // Si la commande est livrée, mettre à jour les stocks
     if (status === 'delivered') {
       await updateStockFromOrder(orderId);
     }
@@ -239,16 +226,12 @@ export const updateOrderStatus = async (orderId, status, notes = "") => {
   }
 };
 
-// Mettre à jour les stocks après livraison
 const updateStockFromOrder = async (orderId) => {
   try {
     const items = await getOrderItems(orderId);
     
     for (const item of items) {
-      // Vous devrez implémenter updateProductQuantity dans productService
-      // Cette fonction augmentera la quantité du produit
       console.log(`Mettre à jour stock produit ${item.productId} : +${item.quantity}`);
-      // await updateProductQuantity(item.productId, item.quantity, 'increase');
     }
     
     return true;
@@ -258,7 +241,6 @@ const updateStockFromOrder = async (orderId) => {
   }
 };
 
-// Mettre à jour une commande
 export const updateOrder = async (orderId, orderData) => {
   try {
     const updateData = {
@@ -271,11 +253,8 @@ export const updateOrder = async (orderId, orderData) => {
     
     await updateDoc(doc(db, ORDERS_COLLECTION, orderId), updateData);
     
-    // Mettre à jour les items si fournis
     if (orderData.items && orderData.items.length > 0) {
-      // Supprimer les anciens items
       await deleteOrderItems(orderId);
-      // Créer les nouveaux items
       await createOrderItems(orderId, orderData.items);
     }
     
@@ -286,7 +265,6 @@ export const updateOrder = async (orderId, orderData) => {
   }
 };
 
-// Supprimer les items d'une commande
 const deleteOrderItems = async (orderId) => {
   try {
     const items = await getOrderItems(orderId);
@@ -304,12 +282,9 @@ const deleteOrderItems = async (orderId) => {
   }
 };
 
-// Supprimer une commande
 export const deleteOrder = async (orderId) => {
   try {
-    // Supprimer d'abord les items
     await deleteOrderItems(orderId);
-    // Puis la commande
     await deleteDoc(doc(db, ORDERS_COLLECTION, orderId));
     
     return orderId;
@@ -319,7 +294,6 @@ export const deleteOrder = async (orderId) => {
   }
 };
 
-// Obtenir les statistiques des commandes
 export const getOrderStats = async () => {
   try {
     const orders = await getAllOrders();
@@ -342,7 +316,6 @@ export const getOrderStats = async () => {
   }
 };
 
-// Rechercher des commandes
 export const searchOrders = async (searchTerm) => {
   try {
     const allOrders = await getAllOrders();
@@ -358,7 +331,6 @@ export const searchOrders = async (searchTerm) => {
   }
 };
 
-// Exporter le service
 export const orderService = {
   createOrder,
   getAllOrders,

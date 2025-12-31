@@ -13,7 +13,6 @@ import {
 import { createUserWithEmailAndPassword,signInWithEmailAndPassword  } from 'firebase/auth';
 import { auth, db } from '../firebase/firebaseConfig';
 
-// Récupérer tous les utilisateurs
 export const getAllUsers = async () => {
   try {
     const usersCollection = collection(db, "users");
@@ -29,7 +28,6 @@ export const getAllUsers = async () => {
   }
 };
 
-// Récupérer un utilisateur par ID
 export const getUserById = async (userId) => {
   try {
     const userDoc = await getDoc(doc(db, "users", userId));
@@ -47,20 +45,16 @@ export const getUserById = async (userId) => {
   }
 };
 
-// Créer un nouvel utilisateur
-// Créer un nouvel utilisateur
+
 export const createUser = async (userData) => {
   try {
     let uid = userData.uid;
     
-    // Si email et mot de passe fournis, créer dans Authentication
     if (userData.email && userData.password && !uid) {
       try {
-        // 1. SAUVER L'ADMIN ACTUEL
         const adminBefore = auth.currentUser;
         console.log('Admin avant création:', adminBefore?.email);
         
-        // 2. Créer le nouvel utilisateur
         const userCredential = await createUserWithEmailAndPassword(
           auth, 
           userData.email, 
@@ -70,16 +64,11 @@ export const createUser = async (userData) => {
         
         console.log('Nouveau user créé:', userData.email);
         
-        // 3. REVENIR À L'ADMIN IMMÉDIATEMENT
-        // Si l'admin était connecté, le reconnecter
+    
         if (adminBefore && adminBefore.email) {
           try {
-            // Déconnecter le nouveau user
-            await auth.signOut(); // Simple et direct
-            
-            // Reconnecter avec l'admin
-            // Ici, tu dois connaître le mot de passe admin
-            // Si c'est toujours le même :
+            await auth.signOut(); 
+
             await signInWithEmailAndPassword(auth, "admin@salon.com", "Admin123@");
             console.log('Reconnecté avec admin');
           } catch (reconnectError) {
@@ -99,7 +88,6 @@ export const createUser = async (userData) => {
       throw new Error("UID requis pour créer un utilisateur");
     }
     
-    // Préparer les données Firestore
     const { password, ...userDataWithoutPassword } = userData;
     
     const userDoc = {
@@ -110,7 +98,6 @@ export const createUser = async (userData) => {
       actif: true
     };
     
-    // Créer dans Firestore
     await setDoc(doc(db, "users", uid), userDoc);
     
     console.log("Utilisateur créé avec ID :", uid);
@@ -121,10 +108,8 @@ export const createUser = async (userData) => {
   }
 };
 
-// Mettre à jour un utilisateur
 export const updateUser = async (userId, userData) => {
   try {
-    // Ne pas mettre à jour l'email ici (c'est géré par Authentication)
     const { email, password, ...dataToUpdate } = userData;
     
     await updateDoc(doc(db, "users", userId), {
@@ -140,7 +125,6 @@ export const updateUser = async (userId, userData) => {
   }
 };
 
-// Supprimer (désactiver) un utilisateur
 export const deleteUser = async (userId) => {
   try {
     await updateDoc(doc(db, "users", userId), {
@@ -156,7 +140,6 @@ export const deleteUser = async (userId) => {
   }
 };
 
-// Rechercher des utilisateurs
 export const searchUsers = async (searchTerm) => {
   try {
     const allUsers = await getAllUsers();
@@ -173,7 +156,6 @@ export const searchUsers = async (searchTerm) => {
   }
 };
 
-// Filtrer par rôle
 export const getUsersByRole = async (role) => {
   try {
     const usersQuery = query(

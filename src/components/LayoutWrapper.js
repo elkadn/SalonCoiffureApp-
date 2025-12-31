@@ -13,17 +13,15 @@ export const LayoutWrapper = ({ children, navigation, showAppBar = true, appBarT
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       
-      {/* AppBar fixe en haut */}
       {showAppBar && (
         <AppBar
           navigation={navigation} 
           title={appBarTitle}
           showLogo={showLogo}
-          openDrawer={openDrawer} // Passez la fonction pour ouvrir le drawer
+          openDrawer={openDrawer} 
         />
       )}
       
-      {/* Contenu principal avec espacement pour l'AppBar */}
       <View style={[
         styles.content,
         showAppBar && styles.contentWithAppBar
@@ -31,11 +29,10 @@ export const LayoutWrapper = ({ children, navigation, showAppBar = true, appBarT
         {children}
       </View>
       
-      {/* Drawer (s'ouvre par-dessus tout) */}
       <CustomDrawer 
         navigation={navigation} 
-        drawerVisible={drawerVisible} // Passez l'état visible
-        closeDrawer={closeDrawer} // Passez la fonction pour fermer
+        drawerVisible={drawerVisible} 
+        closeDrawer={closeDrawer} 
       />
     </View>
   );
@@ -50,6 +47,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentWithAppBar: {
-    paddingTop: 60, // Hauteur de l'AppBar
+    paddingTop: 60, 
   },
 });

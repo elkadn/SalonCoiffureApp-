@@ -1,6 +1,5 @@
 import { getAllUsers, createUser, updateUser, deleteUser } from './userService';
 
-// Statistiques pour le dashboard
 export const getDashboardStats = async () => {
   try {
     const allUsers = await getAllUsers();
@@ -21,20 +20,16 @@ export const getDashboardStats = async () => {
   }
 };
 
-// Vérifier si l'utilisateur est admin
 export const isUserAdmin = (user) => {
   return user && user.role === 'admin';
 };
 
-// Gérer la création d'utilisateur par admin
 export const adminCreateUser = async (userData) => {
-  // Validation supplémentaire pour les admins
   if (!userData.role) {
     throw new Error('Le rôle est requis');
   }
   
   if (userData.role === 'admin') {
-    // Logique spéciale pour créer un autre admin
     console.log('Création d\'un nouvel administrateur');
   }
   

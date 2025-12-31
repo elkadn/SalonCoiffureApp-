@@ -15,20 +15,15 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
-// Collections
 const SERVICES_COLLECTION = "services";
 const PRODUCTS_COLLECTION = "products";
 const USERS_COLLECTION = "users";
 
-// ============ SERVICES ============
 
-// Créer un nouveau service
 export const createService = async (serviceData) => {
   try {
-    // Calculer le prix minimum basé sur les produits associés
     let prixMinimum = parseFloat(serviceData.prix) || 0;
 
-    // Vérifier le prix si des produits sont associés
     if (serviceData.produitsIds && serviceData.produitsIds.length > 0) {
       const produits = await getProductsByIds(serviceData.produitsIds);
       const totalPrixProduits = produits.reduce((sum, produit) => {
@@ -49,8 +44,8 @@ export const createService = async (serviceData) => {
       duree: parseInt(serviceData.duree) || 30,
       produitsIds: serviceData.produitsIds || [],
       stylistesIds: serviceData.stylistesIds || [],
-      images: serviceData.images || [], // Maintenant ce sont des URLs Cloudinary
-      imageUrls: serviceData.images || [], // Pour compatibilité, ajoutez ce champ aussi
+      images: serviceData.images || [], 
+      imageUrls: serviceData.images || [], 
       categorie: serviceData.categorie?.trim() || "",
       actif: true,
       dateCreation: serverTimestamp(),
@@ -70,7 +65,6 @@ export const createService = async (serviceData) => {
   }
 };
 
-// Récupérer tous les services
 export const getAllServices = async () => {
   try {
     const servicesRef = collection(db, SERVICES_COLLECTION);
@@ -87,7 +81,6 @@ export const getAllServices = async () => {
   }
 };
 
-// Récupérer un service par ID
 export const getServiceById = async (serviceId) => {
   try {
     const serviceDoc = await getDoc(doc(db, SERVICES_COLLECTION, serviceId));
@@ -105,7 +98,6 @@ export const getServiceById = async (serviceId) => {
   }
 };
 
-// Mettre à jour un service
 export const updateService = async (serviceId, serviceData) => {
   try {
     const existingService = await getServiceById(serviceId);
@@ -113,10 +105,8 @@ export const updateService = async (serviceId, serviceData) => {
       throw new Error("Service non trouvé");
     }
 
-    // Calculer le prix minimum basé sur les produits associés
     let prixMinimum = parseFloat(serviceData.prix) || existingService.prix;
 
-    // Vérifier le prix si des produits sont associés
     if (serviceData.produitsIds && serviceData.produitsIds.length > 0) {
       const produits = await getProductsByIds(serviceData.produitsIds);
       const totalPrixProduits = produits.reduce((sum, produit) => {
@@ -142,10 +132,9 @@ export const updateService = async (serviceId, serviceData) => {
       dateModification: serverTimestamp(),
     };
 
-    // Gérer les images si fournies
     if (serviceData.images) {
       dataToUpdate.images = serviceData.images;
-      dataToUpdate.imageUrls = serviceData.images; // Pour compatibilité
+      dataToUpdate.imageUrls = serviceData.images; 
     }
 
     await updateDoc(doc(db, SERVICES_COLLECTION, serviceId), dataToUpdate);
@@ -156,7 +145,6 @@ export const updateService = async (serviceId, serviceData) => {
   }
 };
 
-// Supprimer un service (soft delete)
 export const deleteService = async (serviceId) => {
   try {
     await updateDoc(doc(db, SERVICES_COLLECTION, serviceId), {
@@ -172,7 +160,6 @@ export const deleteService = async (serviceId) => {
   }
 };
 
-// Récupérer les produits par leurs IDs
 export const getProductsByIds = async (productIds) => {
   try {
     if (!productIds || productIds.length === 0) return [];
@@ -200,7 +187,6 @@ export const getProductsByIds = async (productIds) => {
   }
 };
 
-// Récupérer les stylistes par leurs IDs
 export const getStylistesByIds = async (stylisteIds) => {
   try {
     if (!stylisteIds || stylisteIds.length === 0) return [];
@@ -229,8 +215,7 @@ export const getStylistesByIds = async (stylisteIds) => {
   }
 };
 
-// Récupérer tous les stylistes actifs
-// Récupérer tous les stylistes actifs
+
 export const getAllStylistes = async () => {
   try {
     const usersRef = collection(db, "users");
@@ -238,7 +223,6 @@ export const getAllStylistes = async () => {
       usersRef,
       where("role", "==", "styliste"),
       where("actif", "==", true)
-      // Retirez orderBy s'il cause des problèmes
     );
 
     const snapshot = await getDocs(q);
@@ -247,7 +231,6 @@ export const getAllStylistes = async () => {
       ...doc.data(),
     }));
 
-    // Tri localement si besoin
     return stylistes.sort((a, b) => {
       const nomA = (a.prenom || "").toLowerCase();
       const nomB = (b.prenom || "").toLowerCase();
@@ -255,12 +238,10 @@ export const getAllStylistes = async () => {
     });
   } catch (error) {
     console.error("Erreur récupération stylistes:", error);
-    // Retourner un tableau vide plutôt que de throw
     return [];
   }
 };
 
-// Rechercher des services
 export const searchServices = async (searchTerm) => {
   try {
     const allServices = await getAllServices();
@@ -280,7 +261,6 @@ export const searchServices = async (searchTerm) => {
   }
 };
 
-// Récupérer les services par catégorie
 export const getServicesByCategory = async (category) => {
   try {
     const servicesRef = collection(db, SERVICES_COLLECTION);
@@ -301,7 +281,6 @@ export const getServicesByCategory = async (category) => {
   }
 };
 
-// Récupérer les services disponibles pour un styliste
 export const getServicesByStyliste = async (stylisteId) => {
   try {
     const servicesRef = collection(db, SERVICES_COLLECTION);
@@ -322,7 +301,6 @@ export const getServicesByStyliste = async (stylisteId) => {
   }
 };
 
-// Obtenir les statistiques des services
 export const getServicesStats = async () => {
   try {
     const services = await getAllServices();
@@ -366,26 +344,21 @@ export const getServicesStats = async () => {
   }
 };
 
-// Service complet
 export const serviceService = {
-  // CRUD Services
   createService,
   getAllServices,
   getServiceById,
   updateService,
   deleteService,
 
-  // Récupération des données associées
   getProductsByIds,
   getStylistesByIds,
   getAllStylistes,
 
-  // Recherche et filtres
   searchServices,
   getServicesByCategory,
   getServicesByStyliste,
 
-  // Statistiques
   getServicesStats,
 };
 

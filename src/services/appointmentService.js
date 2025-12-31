@@ -16,34 +16,27 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
-// Collections
 const APPOINTMENTS_COLLECTION = "appointments";
 const CRENEAUX_COLLECTION = "creneaux";
 const SERVICES_COLLECTION = "services";
 
-// ============ RENDEZ-VOUS ============
 
-// Créer un rendez-vous avec sélection automatique du styliste
 export const createAppointment = async (appointmentData) => {
   try {
     const { serviceId, clientId, date, time, notes } = appointmentData;
 
-    // 1. Récupérer le service
     const service = await getServiceById(serviceId);
     if (!service) {
       throw new Error("Service non trouvé");
     }
 
-    // 2. Convertir la date et l'heure en objet Date
     const [year, month, day] = date.split("-");
     const [hours, minutes] = time.split(":");
     const appointmentDateTime = new Date(year, month - 1, day, hours, minutes);
 
-    // Calculer l'heure de fin basée sur la durée du service
     const endDateTime = new Date(appointmentDateTime);
     endDateTime.setMinutes(endDateTime.getMinutes() + (service.duree || 30));
 
-    // 3. Trouver un styliste disponible
     const availableStylist = await findAvailableStylist(
       service.stylistesIds,
       appointmentDateTime,
@@ -56,7 +49,6 @@ export const createAppointment = async (appointmentData) => {
       throw new Error("Aucun styliste disponible pour ce créneau");
     }
 
-    // 4. Créer le rendez-vous
     const appointmentId = doc(collection(db, APPOINTMENTS_COLLECTION)).id;
     const appointmentDoc = {
       id: appointmentId,
@@ -71,23 +63,20 @@ export const createAppointment = async (appointmentData) => {
       date: Timestamp.fromDate(appointmentDateTime),
       endDate: Timestamp.fromDate(endDateTime),
       time: time,
-      dateString: date, // Pour faciliter les requêtes
-      status: "confirmed", // confirmed, cancelled, completed
+      dateString: date, 
+      status: "confirmed", 
       notes: notes || "",
-      paymentStatus: "pending", // pending, paid, refunded
+      paymentStatus: "pending", 
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
 
-    // 5. Utiliser une transaction pour garantir la cohérence
     const batch = writeBatch(db);
 
-    // Créer le rendez-vous
     const appointmentRef = doc(db, APPOINTMENTS_COLLECTION, appointmentId);
     batch.set(appointmentRef, appointmentDoc);
 
-    // 6. Vérifier si on a besoin de bloquer le créneau (optionnel)
-    // Vous pouvez ajouter ici un système de réservation temporaire
+ 
 
     await batch.commit();
 
@@ -98,7 +87,6 @@ export const createAppointment = async (appointmentData) => {
   }
 };
 
-// Trouver un styliste disponible
 export const findAvailableStylist = async (
   stylisteIds,
   startTime,
@@ -111,7 +99,6 @@ export const findAvailableStylist = async (
       throw new Error("Aucun styliste associé à ce service");
     }
 
-    // 1. Récupérer tous les stylistes actifs
     const allStylists = await getAllStylistes();
     const serviceStylists = allStylists.filter((stylist) =>
       stylisteIds.includes(stylist.id)
@@ -121,7 +108,6 @@ export const findAvailableStylist = async (
       throw new Error("Aucun styliste actif pour ce service");
     }
 
-    // 2. Récupérer les créneaux des stylistes pour ce jour
     const dayOfWeek = getDayOfWeekFromDate(dateString);
     const creneauxQuery = query(
       collection(db, CRENEAUX_COLLECTION),
@@ -136,11 +122,10 @@ export const findAvailableStylist = async (
       ...doc.data(),
     }));
 
-    // 3. Récupérer les rendez-vous existants pour cette période
     const appointmentsQuery = query(
       collection(db, APPOINTMENTS_COLLECTION),
       where("dateString", "==", dateString),
-      where("status", "in", ["confirmed", "pending"]), // Rendez-vous actifs
+      where("status", "in", ["confirmed", "pending"]), 
       where("stylistId", "in", stylisteIds)
     );
 
@@ -150,16 +135,13 @@ export const findAvailableStylist = async (
       ...doc.data(),
     }));
 
-    // 4. Trouver un styliste disponible
     for (const stylist of serviceStylists) {
-      // Vérifier si le styliste a un créneau pour ce jour
       const stylistCreneaux = creneaux.filter(
         (c) => c.stylisteId === stylist.id
       );
 
       if (stylistCreneaux.length === 0) continue;
 
-      // Vérifier si le styliste est disponible pendant ce créneau
       const isWithinCreneau = stylistCreneaux.some((creneau) => {
         const [startHour, startMinute] = creneau.heureDebut
           .split(":")
@@ -177,7 +159,6 @@ export const findAvailableStylist = async (
 
       if (!isWithinCreneau) continue;
 
-      // Vérifier les conflits avec les rendez-vous existants
       const stylistAppointments = existingAppointments.filter(
         (app) => app.stylistId === stylist.id
       );
@@ -186,23 +167,21 @@ export const findAvailableStylist = async (
         const appStart = app.date.toDate();
         const appEnd = app.endDate.toDate();
 
-        // Vérifier si les périodes se chevauchent
         return startTime < appEnd && endTime > appStart;
       });
 
       if (!hasConflict) {
-        return stylist; // Styliste disponible trouvé
+        return stylist; 
       }
     }
 
-    return null; // Aucun styliste disponible
+    return null; 
   } catch (error) {
     console.error("Erreur recherche styliste:", error);
     throw error;
   }
 };
 
-// Fonction utilitaire pour obtenir le jour de la semaine
 const getDayOfWeekFromDate = (dateString) => {
   const date = new Date(dateString);
   const days = [
@@ -217,30 +196,26 @@ const getDayOfWeekFromDate = (dateString) => {
   return days[date.getDay()];
 };
 
-// Récupérer tous les rendez-vous d'un client
-// Récupérer tous les rendez-vous d'un client (version temporaire sans orderBy)
+
 export const getClientAppointments = async (clientId) => {
   try {
     const appointmentsRef = collection(db, APPOINTMENTS_COLLECTION);
     const q = query(
       appointmentsRef,
       where("clientId", "==", clientId)
-      // Enlevez temporairement: orderBy("date", "desc")
     );
 
     const snapshot = await getDocs(q);
 
-    // Triez manuellement après récupération
     const appointments = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    // Tri manuel par date (du plus récent au plus ancien)
     appointments.sort((a, b) => {
       const dateA = a.date?.toDate() || new Date(0);
       const dateB = b.date?.toDate() || new Date(0);
-      return dateB - dateA; // Tri descendant
+      return dateB - dateA; 
     });
 
     return appointments;
@@ -250,32 +225,26 @@ export const getClientAppointments = async (clientId) => {
   }
 };
 
-// Récupérer tous les rendez-vous d'un styliste
-// Améliorez la fonction getStylistAppointments
 export const getStylistAppointments = async (stylistId) => {
   try {
     const appointmentsRef = collection(db, APPOINTMENTS_COLLECTION);
 
-    // Version simplifiée sans orderBy qui nécessite un index
     const q = query(
       appointmentsRef,
       where("stylistId", "==", stylistId)
-      // Retirez temporairement le orderBy pour éviter l'erreur d'index
     );
 
     const snapshot = await getDocs(q);
 
-    // Triez manuellement après récupération
     const appointments = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    // Tri manuel par date (du plus récent au plus ancien)
     appointments.sort((a, b) => {
       const dateA = a.date?.toDate() || new Date(0);
       const dateB = b.date?.toDate() || new Date(0);
-      return dateB - dateA; // Tri descendant
+      return dateB - dateA; 
     });
 
     return appointments;
@@ -284,7 +253,6 @@ export const getStylistAppointments = async (stylistId) => {
     throw error;
   }
 };
-// Ajoutez cette fonction pour les statistiques styliste
 export const getStylistAppointmentStats = async (
   stylistId,
   period = "month"
@@ -292,7 +260,6 @@ export const getStylistAppointmentStats = async (
   try {
     let startDate = new Date();
 
-    // Définir la période
     switch (period) {
       case "today":
         startDate.setHours(0, 0, 0, 0);
@@ -307,13 +274,11 @@ export const getStylistAppointmentStats = async (
         startDate.setMonth(startDate.getMonth() - 1);
     }
 
-    // Récupérer les rendez-vous
     const appointments = await getStylistAppointments(stylistId, {
       startDate,
       order: "desc",
     });
 
-    // Calculer les statistiques
     const stats = {
       total: appointments.length,
       confirmed: appointments.filter((a) => a.status === "confirmed").length,
@@ -327,7 +292,7 @@ export const getStylistAppointmentStats = async (
       revenue: appointments
         .filter((a) => a.status === "completed")
         .reduce((sum, a) => sum + (a.servicePrice || 0), 0),
-      averageRating: 0, // À implémenter si vous avez un système de notation
+      averageRating: 0, 
     };
 
     return stats;
@@ -337,7 +302,6 @@ export const getStylistAppointmentStats = async (
   }
 };
 
-// Annuler un rendez-vous
 export const cancelAppointment = async (appointmentId) => {
   try {
     await updateDoc(doc(db, APPOINTMENTS_COLLECTION, appointmentId), {
@@ -352,7 +316,6 @@ export const cancelAppointment = async (appointmentId) => {
   }
 };
 
-// Vérifier la disponibilité d'un créneau
 export const checkAvailability = async (serviceId, date, time) => {
   try {
     const service = await getServiceById(serviceId);
@@ -385,7 +348,6 @@ export const checkAvailability = async (serviceId, date, time) => {
   }
 };
 
-// Récupérer les horaires disponibles pour un service
 export const getAvailableSlots = async (serviceId, date) => {
   try {
     const service = await getServiceById(serviceId);
@@ -396,7 +358,6 @@ export const getAvailableSlots = async (serviceId, date) => {
     const dayOfWeek = getDayOfWeekFromDate(date);
     const slots = [];
 
-    // Récupérer tous les créneaux des stylistes pour ce jour
     const creneauxQuery = query(
       collection(db, CRENEAUX_COLLECTION),
       where("stylisteId", "in", service.stylistesIds),
@@ -410,7 +371,6 @@ export const getAvailableSlots = async (serviceId, date) => {
       ...doc.data(),
     }));
 
-    // Récupérer les rendez-vous existants
     const appointmentsQuery = query(
       collection(db, APPOINTMENTS_COLLECTION),
       where("dateString", "==", date),
@@ -423,7 +383,6 @@ export const getAvailableSlots = async (serviceId, date) => {
       ...doc.data(),
     }));
 
-    // Générer les créneaux disponibles
     for (const creneau of creneaux) {
       const [startHour, startMinute] = creneau.heureDebut
         .split(":")
@@ -436,14 +395,11 @@ export const getAvailableSlots = async (serviceId, date) => {
       const endTime = new Date(date);
       endTime.setHours(endHour, endMinute, 0, 0);
 
-      // Générer des créneaux toutes les 15 minutes
       while (currentTime < endTime) {
         const slotEnd = new Date(currentTime);
         slotEnd.setMinutes(slotEnd.getMinutes() + service.duree);
 
-        // Vérifier si le créneau tient dans l'horaire du styliste
         if (slotEnd <= endTime) {
-          // Vérifier les conflits avec les rendez-vous existants
           const hasConflict = existingAppointments.some((app) => {
             if (app.stylistId !== creneau.stylisteId) return false;
 
@@ -468,12 +424,10 @@ export const getAvailableSlots = async (serviceId, date) => {
           }
         }
 
-        // Avancer de 15 minutes pour le prochain créneau
         currentTime.setMinutes(currentTime.getMinutes() + 15);
       }
     }
 
-    // Trier les créneaux par heure
     slots.sort((a, b) => a.time.localeCompare(b.time));
 
     return slots;
@@ -483,7 +437,6 @@ export const getAvailableSlots = async (serviceId, date) => {
   }
 };
 
-// Fonction pour récupérer un service par ID (si elle n'existe pas déjà)
 const getServiceById = async (serviceId) => {
   try {
     const serviceDoc = await getDoc(doc(db, SERVICES_COLLECTION, serviceId));
@@ -501,7 +454,6 @@ const getServiceById = async (serviceId) => {
   }
 };
 
-// Fonction pour récupérer tous les stylistes (si elle n'existe pas déjà)
 const getAllStylistes = async () => {
   try {
     const usersRef = collection(db, "users");
@@ -548,7 +500,6 @@ export const getClientAppointmentStats = async (clientId) => {
   }
 };
 
-// Mettre à jour le statut d'un rendez-vous (pour l'admin)
 export const updateAppointmentStatus = async (appointmentId, status) => {
   try {
     const validStatuses = ["confirmed", "cancelled", "completed", "pending"];
@@ -568,7 +519,6 @@ export const updateAppointmentStatus = async (appointmentId, status) => {
   }
 };
 
-// Récupérer tous les rendez-vous (pour l'admin)
 export const getAllAppointments = async (startDate, endDate) => {
   try {
     const appointmentsRef = collection(db, APPOINTMENTS_COLLECTION);
@@ -612,7 +562,6 @@ export const getAppointmentById = async (appointmentId) => {
   }
 };
 
-// Récupérer les informations du client pour un rendez-vous
 export const getClientInfoForAppointment = async (clientId) => {
   try {
     const userRef = doc(db, "users", clientId);
@@ -631,7 +580,6 @@ export const getClientInfoForAppointment = async (clientId) => {
   }
 };
 
-// Service complet
 export const appointmentService = {
   createAppointment,
   findAvailableStylist,

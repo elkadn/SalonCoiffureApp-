@@ -1,4 +1,3 @@
-// services/authService.js
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
@@ -14,7 +13,7 @@ import {
   query,
   where,
   getDocs,
-  serverTimestamp // IMPORTANT: Pour les timestamps Firestore
+  serverTimestamp 
 } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebaseConfig';
 
@@ -30,26 +29,22 @@ const checkUserExistsByEmail = async (email) => {
   }
 };
 
-// Connexion pour TOUS les utilisateurs
 export const loginUser = async (email, password) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     
-    // Récupérer données Firestore
     const userDoc = await getDoc(doc(db, "users", user.uid));
     
     if (userDoc.exists()) {
       const userData = userDoc.data();
       
-      // Retourner les données utilisateur quelle que soit son rôle
       return {
         ...userData,
         uid: user.uid,
         email: user.email
       };
     } else {
-      // Créer le document si inexistant avec rôle "client" par défaut
       const userData = {
         uid: user.uid,
         email: user.email,
@@ -74,7 +69,6 @@ export const loginUser = async (email, password) => {
   } catch (error) {
     console.error('Erreur connexion:', error);
     
-    // Messages d'erreur personnalisés
     switch (error.code) {
       case 'auth/invalid-credential':
       case 'auth/wrong-password':
@@ -93,42 +87,35 @@ export const loginUser = async (email, password) => {
   }
 };
 
-// Inscription pour les nouveaux utilisateurs
 export const registerUser = async (email, password, userData) => {
   try {
-    // Vérifier si l'email existe déjà
     const emailExists = await checkUserExistsByEmail(email);
     if (emailExists) {
       throw new Error('Cet email est déjà utilisé');
     }
 
-    // Créer l'utilisateur dans Authentication
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     
-    // Préparer les données utilisateur complètes avec structure cohérente
     const completeUserData = {
       uid: user.uid,
       email: email.toLowerCase().trim(),
       nom: userData.nom?.trim() || "",
       prenom: userData.prenom?.trim() || "",
-      role: "client", // Toujours client pour les inscriptions publiques
+      role: "client",
       telephone: userData.telephone?.trim() || "",
-      pointsFidelite: 0, // Initialisation des points
+      pointsFidelite: 0, 
       actif: true,
       dateCreation: serverTimestamp(),
       dateModification: serverTimestamp(),
-      // Vous pouvez ajouter d'autres champs spécifiques ici
       preferences: {
         notifications: true,
         newsletter: false,
       }
     };
     
-    // Sauvegarder dans Firestore
     await setDoc(doc(db, "users", user.uid), completeUserData);
     
-    // Retourner les données formatées pour le contexte
     return {
       ...completeUserData,
       uid: user.uid,
@@ -157,7 +144,6 @@ export const registerUser = async (email, password, userData) => {
   }
 };
 
-// Mettre à jour les données utilisateur
 export const updateUserProfile = async (userId, updates) => {
   try {
     const userRef = doc(db, "users", userId);
@@ -173,7 +159,6 @@ export const updateUserProfile = async (userId, updates) => {
   }
 };
 
-// Fonctions utilitaires
 export const logoutUser = async () => {
   try {
     await signOut(auth);
@@ -191,13 +176,10 @@ export const getCurrentUser = () => {
   return auth.currentUser;
 };
 
-// Réinitialiser mot de passe - SÉCURISÉ
 export const resetPassword = async (email) => {
   try {
-    // Firebase envoie l'email UNIQUEMENT si l'adresse existe
     await sendPasswordResetEmail(auth, email);
     
-    // TOUJOURS retourner le même message, même si l'email n'existe pas
     return {
       success: true,
       message: "Si votre email existe dans notre système, vous recevrez un lien de réinitialisation."
@@ -205,17 +187,13 @@ export const resetPassword = async (email) => {
   } catch (error) {
     console.error('Erreur réinitialisation:', error);
     
-    // Firebase retourne auth/user-not-found si l'email n'existe pas
-    // Mais pour la sécurité, on ne le révèle pas
     if (error.code === 'auth/user-not-found') {
-      // On retourne le même message pour ne pas révéler que l'email n'existe pas
       return {
         success: true,
         message: "Si votre email existe dans notre système, vous recevrez un lien de réinitialisation."
       };
     }
     
-    // Pour les autres erreurs
     throw new Error("Une erreur est survenue. Veuillez réessayer plus tard.");
   }
 };
