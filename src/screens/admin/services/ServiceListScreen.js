@@ -114,7 +114,6 @@ const ServiceListScreen = ({ navigation }) => {
 
   const viewServiceDetails = async (service) => {
     try {
-      // Charger les détails complets
       const fullService = await serviceService.getServiceById(service.id);
 
       if (fullService.produitsIds && fullService.produitsIds.length > 0) {
@@ -198,7 +197,6 @@ const ServiceListScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Gestion des Services</Text>
         <TouchableOpacity
@@ -209,7 +207,6 @@ const ServiceListScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Filtres et recherche */}
       <View style={styles.filtersContainer}>
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#666" />
@@ -248,7 +245,6 @@ const ServiceListScreen = ({ navigation }) => {
         </ScrollView>
       </View>
 
-      {/* Liste des services */}
       {loading ? (
         <View style={styles.loadingContainer}>
           <Text>Chargement...</Text>
@@ -276,7 +272,6 @@ const ServiceListScreen = ({ navigation }) => {
         />
       )}
 
-      {/* Modal de détails */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -604,7 +599,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
   },
-  // Modal styles
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",

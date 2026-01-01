@@ -21,7 +21,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
   const { serviceId } = route.params || {};
   const isEditMode = !!serviceId;
 
-  // États du formulaire
   const [formData, setFormData] = useState({
     nom: "",
     description: "",
@@ -33,7 +32,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
     images: [],
   });
 
-  // États des données
   const [produits, setProduits] = useState([]);
   const [stylistes, setStylistes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -85,7 +83,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
       setProduits(produitsData.filter((p) => p.actif !== false));
       setStylistes(stylistesData);
 
-      // Charger les catégories existantes des services si en mode édition
       if (isEditMode) {
         const allServices = await serviceService.getAllServices();
         const existingCategories = [
@@ -96,7 +93,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
           ),
         ];
 
-        // Fusionner avec les catégories par défaut
         const mergedCategories = [
           ...new Set([...categories, ...existingCategories]),
         ];
@@ -141,7 +137,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
           images: service.images || [],
         });
 
-        // Charger les produits sélectionnés
         if (service.produitsIds && service.produitsIds.length > 0) {
           console.log("Chargement produits...");
           const produitsSelectionnes = await serviceService.getProductsByIds(
@@ -156,15 +151,12 @@ const ServiceFormScreen = ({ route, navigation }) => {
           setTotalProduitsPrix(total);
         }
 
-        // Charger les stylistes sélectionnés - CORRECTION ICI
         if (service.stylistesIds && service.stylistesIds.length > 0) {
           console.log("Chargement stylistes avec IDs:", service.stylistesIds);
 
-          // D'abord, récupérer tous les stylistes
           const allStylistes = await serviceService.getAllStylistes();
           console.log("Tous les stylistes disponibles:", allStylistes.length);
 
-          // Filtrer pour ne garder que ceux dont l'ID est dans stylistesIds
           const stylistesSelectionnes = allStylistes.filter((styliste) =>
             service.stylistesIds.includes(styliste.id)
           );
@@ -177,7 +169,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
 
           setSelectedStylistes(stylistesSelectionnes);
 
-          // S'assurer que les IDs sont bien mis à jour
           setFormData((prev) => ({
             ...prev,
             stylistesIds: stylistesSelectionnes.map((s) => s.id),
@@ -240,7 +231,7 @@ const ServiceFormScreen = ({ route, navigation }) => {
       if (imageUri) {
         setFormData((prev) => ({
           ...prev,
-          images: [...prev.images, imageUri], // URI temporaire locale
+          images: [...prev.images, imageUri], 
         }));
       }
     } catch (error) {
@@ -257,18 +248,15 @@ const ServiceFormScreen = ({ route, navigation }) => {
   };
 
   const handleSelectProduit = (produit) => {
-    // Vérifier si le produit est déjà sélectionné
     if (selectedProduits.find((p) => p.id === produit.id)) {
       handleRemoveProduit(produit.id);
     } else {
       const newSelected = [...selectedProduits, produit];
       setSelectedProduits(newSelected);
 
-      // Calculer le nouveau total
       const total = newSelected.reduce((sum, p) => sum + (p.prixVente || 0), 0);
       setTotalProduitsPrix(total);
 
-      // Mettre à jour les IDs
       setFormData((prev) => ({
         ...prev,
         produitsIds: newSelected.map((p) => p.id),
@@ -280,11 +268,9 @@ const ServiceFormScreen = ({ route, navigation }) => {
     const newSelected = selectedProduits.filter((p) => p.id !== produitId);
     setSelectedProduits(newSelected);
 
-    // Calculer le nouveau total
     const total = newSelected.reduce((sum, p) => sum + (p.prixVente || 0), 0);
     setTotalProduitsPrix(total);
 
-    // Mettre à jour les IDs
     setFormData((prev) => ({
       ...prev,
       produitsIds: newSelected.map((p) => p.id),
@@ -324,7 +310,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
       return false;
     }
 
-    // Vérifier le prix minimum
     const prixSaisi = parseFloat(formData.prix);
     if (prixSaisi < totalProduitsPrix) {
       Alert.alert(
@@ -343,17 +328,12 @@ const ServiceFormScreen = ({ route, navigation }) => {
     try {
       setSaving(true);
 
-      // Sauvegarder les images sur Cloudinary
-      // Actuellement vous avez probablement ceci (ligne ~430-445) :
       const imagesCloudinary = [];
       for (const imageUri of formData.images) {
         try {
-          // Vérifier si c'est déjà une URL Cloudinary ou une URI locale
           if (imageUri.includes("cloudinary.com")) {
-            // C'est déjà une URL Cloudinary (en mode édition)
             imagesCloudinary.push(imageUri);
           } else {
-            // Upload vers Cloudinary
             console.log("📤 Upload image service vers Cloudinary...");
             const cloudinaryResult = await uploadToCloudinary(
               imageUri,
@@ -367,7 +347,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
             "Attention",
             `Une image n'a pas pu être uploadée: ${error.message}`
           );
-          // Continuer avec les autres images
         }
       }
 
@@ -504,7 +483,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
               style={[styles.modalButton, styles.modalSecondaryButton]}
               onPress={() => {
                 setModalCategorieVisible(false);
-                // Option pour ajouter une nouvelle catégorie
                 Alert.prompt(
                   "Nouvelle catégorie",
                   "Entrez le nom de la nouvelle catégorie:",
@@ -619,7 +597,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="#333" />
@@ -634,7 +611,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Informations de base */}
         <View style={styles.formSection}>
           <Text style={styles.sectionTitle}>Informations de base</Text>
 
@@ -684,7 +660,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
             </View>
           </View>
 
-          {/* Catégorie - version dropdown */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Catégorie</Text>
             <TouchableOpacity
@@ -705,7 +680,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
           </View>
         </View>
 
-        {/* Images */}
         <View style={styles.formSection}>
           <Text style={styles.sectionTitle}>Photos de référence</Text>
           <Text style={styles.sectionSubtitle}>
@@ -735,8 +709,7 @@ const ServiceFormScreen = ({ route, navigation }) => {
           </ScrollView>
         </View>
 
-        {/* Produits */}
-        {/* Produits */}
+      
         <View style={styles.formSection}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionHeaderLeft}>
@@ -782,8 +755,7 @@ const ServiceFormScreen = ({ route, navigation }) => {
           )}
         </View>
 
-        {/* Stylistes */}
-        {/* Stylistes */}
+        
         <View style={styles.formSection}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionHeaderLeft}>
@@ -829,7 +801,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
           )}
         </View>
 
-        {/* Bouton de sauvegarde */}
         <TouchableOpacity
           style={[styles.submitButton, saving && styles.submitButtonDisabled]}
           onPress={handleSubmit}
@@ -845,7 +816,6 @@ const ServiceFormScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Modals */}
       {renderProduitModal()}
       {renderStylisteModal()}
       {renderCategorieModal()}
@@ -1032,7 +1002,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  // Modal styles
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -1134,16 +1103,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#757575",
     marginBottom: 10,
   },
-  // Ajoutez après sectionHeader dans les styles
   sectionHeaderLeft: {
     flex: 1,
-    marginRight: 10, // Espace entre le texte et le bouton
+    marginRight: 10, 
   },
 
-  // Modifiez aussi ces styles existants si besoin
   selectedItemsContainer: {
     marginTop: 10,
-    maxHeight: 200, // Limite la hauteur avec scroll
+    maxHeight: 200, 
   },
 
   selectedItem: {
@@ -1162,7 +1129,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 20,
-    minWidth: 100, // Largeur minimale fixe
+    minWidth: 100, 
     alignItems: "center",
   },
 });

@@ -23,7 +23,6 @@ const OrderList = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Charger les commandes
   const loadOrders = async () => {
     try {
       setLoading(true);
@@ -39,20 +38,17 @@ const OrderList = ({ navigation }) => {
     }
   };
 
-  // Recharger quand l'écran est focus
   useFocusEffect(
     React.useCallback(() => {
       loadOrders();
     }, [])
   );
 
-  // Rafraîchir
   const onRefresh = () => {
     setRefreshing(true);
     loadOrders();
   };
 
-  // Rechercher
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredOrders(orders);
@@ -69,7 +65,6 @@ const OrderList = ({ navigation }) => {
     }
   }, [searchTerm, orders]);
 
-  // Formater la date
   const formatDate = (timestamp) => {
     if (!timestamp) return "N/A";
     try {
@@ -80,7 +75,6 @@ const OrderList = ({ navigation }) => {
     }
   };
 
-  // Obtenir la couleur du statut
   const getStatusColor = (status) => {
     switch (status) {
       case "pending":
@@ -96,7 +90,6 @@ const OrderList = ({ navigation }) => {
     }
   };
 
-  // Obtenir le texte du statut
   const getStatusText = (status) => {
     switch (status) {
       case "pending":
@@ -112,7 +105,6 @@ const OrderList = ({ navigation }) => {
     }
   };
 
-  // Confirmer la suppression
   const confirmDelete = (order) => {
     Alert.alert(
       "Supprimer la commande",
@@ -128,7 +120,6 @@ const OrderList = ({ navigation }) => {
     );
   };
 
-  // Supprimer une commande
   const deleteOrder = async (orderId) => {
     try {
       await orderService.deleteOrder(orderId);
@@ -140,7 +131,6 @@ const OrderList = ({ navigation }) => {
     }
   };
 
-  // Rendu d'un item de commande
   const renderOrderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.orderCard}
@@ -233,7 +223,6 @@ const OrderList = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Barre de recherche */}
       <View style={styles.searchContainer}>
         <Icon name="search" size={20} color="#666" style={styles.searchIcon} />
         <TextInput
@@ -249,7 +238,6 @@ const OrderList = ({ navigation }) => {
         )}
       </View>
 
-      {/* Liste des commandes */}
       <FlatList
         data={filteredOrders}
         renderItem={renderOrderItem}

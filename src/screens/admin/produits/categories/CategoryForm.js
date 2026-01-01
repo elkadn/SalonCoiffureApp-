@@ -1,4 +1,3 @@
-// screens/admin/CategoryForm.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -46,7 +45,6 @@ const CategoryForm = ({ navigation, route }) => {
     }
   };
 
-  // screens/admin/CategoryForm.js - CORRECTION validateForm
 const validateForm = async () => {
   const newErrors = {};
 
@@ -56,20 +54,16 @@ const validateForm = async () => {
     newErrors.nom = "Le nom doit contenir au moins 2 caractères";
   } else {
     try {
-      // CORRECTION : Inverser la logique
       const isUnique = await productService.checkUniqueCategoryName(
         nom.trim(),
         isEditMode ? categoryId : null
       );
       
-      if (!isUnique) { // Si isUnique est false, alors le nom existe
+      if (!isUnique) { 
         newErrors.nom = "Cette catégorie existe déjà";
       }
-      // Note: isUnique = true signifie que le nom n'existe pas
     } catch (error) {
       console.error("Erreur vérification:", error);
-      // Ne pas bloquer en cas d'erreur réseau
-      // newErrors.nom = "Erreur de vérification";
     }
   }
 
@@ -133,7 +127,6 @@ const validateForm = async () => {
 
       <ScrollView style={styles.content}>
         <View style={styles.formCard}>
-          {/* Champ Nom */}
           <View style={styles.formGroup}>
             <Text style={styles.label}>
               Nom de la catégorie <Text style={styles.required}>*</Text>
@@ -152,7 +145,6 @@ const validateForm = async () => {
             </Text>
           </View>
 
-          {/* Champ Description */}
           <View style={styles.formGroup}>
             <Text style={styles.label}>Description</Text>
             <TextInput
@@ -173,7 +165,6 @@ const validateForm = async () => {
             </Text>
           </View>
 
-          {/* Informations */}
           <View style={styles.infoBox}>
             <Icon name="info" size={18} color="#666" />
             <Text style={styles.infoText}>
@@ -184,7 +175,6 @@ const validateForm = async () => {
         </View>
       </ScrollView>
 
-      {/* Boutons d'action */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.cancelButton}

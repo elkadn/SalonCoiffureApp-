@@ -194,7 +194,6 @@ const StylisteCreneauxScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Icon name="arrow-back" size={24} color="#fff" />
@@ -218,7 +217,6 @@ const StylisteCreneauxScreen = ({ navigation, route }) => {
         {joursSemaine.map(jour => renderJourCard(jour))}
       </ScrollView>
 
-      {/* Modal pour ajouter/modifier un créneau */}
       <Modal
         visible={modalVisible}
         animationType="slide"

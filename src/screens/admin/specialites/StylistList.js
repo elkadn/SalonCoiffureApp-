@@ -1,4 +1,3 @@
-// screens/admin/StylisteList.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -43,7 +42,6 @@ const StylisteList = ({ navigation }) => {
     try {
       setLoading(true);
       const data = await getUsersByRole("styliste");
-      // Filtrer uniquement les stylistes actifs
       const activeStylistes = data.filter(user => user.actif !== false);
       setStylistes(activeStylistes);
       setFilteredStylistes(activeStylistes);

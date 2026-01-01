@@ -1,4 +1,3 @@
-// screens/admin/ProductManagement.js
 import React from "react";
 import {
   View,

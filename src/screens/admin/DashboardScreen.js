@@ -12,7 +12,7 @@ import { getDashboardStats } from "../../services/adminService";
 import { useAuth } from "../../context/AuthContext";
 
 const DashboardScreen = ({ navigation }) => {
-  const { userData } = useAuth(); // CHANGÉ: utilisez userData depuis AuthContext
+  const { userData } = useAuth(); 
   const [stats, setStats] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -108,7 +108,6 @@ const DashboardScreen = ({ navigation }) => {
           </View>
         )}
 
-        {/* Menu de gestion */}
         <Text style={styles.sectionTitle}>Gestion</Text>
 
         {menuItems.map((item, index) => (

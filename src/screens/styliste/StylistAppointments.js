@@ -22,15 +22,13 @@ const StylistAppointments = ({ navigation }) => {
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [filter, setFilter] = useState('today'); // today, upcoming, past, all
+  const [filter, setFilter] = useState('today'); 
 
-  // Charger les rendez-vous du styliste
   const loadAppointments = async () => {
     if (!currentUser) return;
     
     try {
       setLoading(true);
-      // Utilisez la fonction de base sans options
       const data = await appointmentService.getStylistAppointments(currentUser.uid);
       setAppointments(data);
       applyFilter(data, filter);
@@ -43,7 +41,6 @@ const StylistAppointments = ({ navigation }) => {
     }
   };
 
-  // Appliquer le filtre
   const applyFilter = (data, filterType) => {
     const now = new Date();
     
@@ -60,7 +57,7 @@ const StylistAppointments = ({ navigation }) => {
         setFilteredAppointments(filteredToday.sort((a, b) => {
           const dateA = a.date?.toDate() || new Date(0);
           const dateB = b.date?.toDate() || new Date(0);
-          return dateA - dateB; // Tri ascendant pour aujourd'hui
+          return dateA - dateB; 
         }));
         break;
         
@@ -76,7 +73,7 @@ const StylistAppointments = ({ navigation }) => {
         setFilteredAppointments(filteredUpcoming.sort((a, b) => {
           const dateA = a.date?.toDate() || new Date(0);
           const dateB = b.date?.toDate() || new Date(0);
-          return dateA - dateB; // Tri ascendant pour les futurs
+          return dateA - dateB; 
         }));
         break;
         
@@ -92,35 +89,30 @@ const StylistAppointments = ({ navigation }) => {
         setFilteredAppointments(filteredPast.sort((a, b) => {
           const dateA = a.date?.toDate() || new Date(0);
           const dateB = b.date?.toDate() || new Date(0);
-          return dateB - dateA; // Tri descendant pour les passés
+          return dateB - dateA;
         }));
         break;
         
       default:
-        // Pour "all", on garde le tri existant (descendant)
         setFilteredAppointments([...data]);
     }
   };
 
-  // Recharger quand l'écran est focus
   useFocusEffect(
     React.useCallback(() => {
       loadAppointments();
     }, [currentUser])
   );
 
-  // Rafraîchir
   const onRefresh = () => {
     setRefreshing(true);
     loadAppointments();
   };
 
-  // Changer le filtre
   useEffect(() => {
     applyFilter(appointments, filter);
   }, [filter, appointments]);
 
-  // Formater la date
   const formatDate = (timestamp) => {
     if (!timestamp) return 'N/A';
     try {
@@ -131,7 +123,6 @@ const StylistAppointments = ({ navigation }) => {
     }
   };
 
-  // Obtenir la couleur du statut
   const getStatusColor = (status) => {
     switch (status) {
       case 'confirmed': return '#4CAF50';
@@ -142,7 +133,6 @@ const StylistAppointments = ({ navigation }) => {
     }
   };
 
-  // Obtenir le texte du statut
   const getStatusText = (status) => {
     switch (status) {
       case 'confirmed': return 'Confirmé';
@@ -153,7 +143,6 @@ const StylistAppointments = ({ navigation }) => {
     }
   };
 
-  // Rendu d'un rendez-vous
   const renderAppointment = ({ item }) => {
     let appDate;
     try {
@@ -220,7 +209,6 @@ const StylistAppointments = ({ navigation }) => {
     );
   };
 
-  // Statistiques
   const getStats = () => {
     const todayAppointments = appointments.filter(app => {
       try {
@@ -267,7 +255,6 @@ const StylistAppointments = ({ navigation }) => {
         <View style={styles.placeholder} />
       </View>
 
-      {/* Statistiques */}
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>{stats.today}</Text>
@@ -285,7 +272,6 @@ const StylistAppointments = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Filtres */}
       <View style={styles.filtersContainer}>
         <TouchableOpacity
           style={[styles.filterButton, filter === 'today' && styles.filterButtonActive]}
@@ -324,7 +310,6 @@ const StylistAppointments = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Liste des rendez-vous */}
       <FlatList
         data={filteredAppointments}
         renderItem={renderAppointment}

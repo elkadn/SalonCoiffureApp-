@@ -74,7 +74,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
       const serviceData = await getServiceById(serviceId);
       setService(serviceData);
 
-      // Charger les stylistes si disponibles
       if (serviceData?.stylistesIds?.length > 0) {
         const allStylists = await getAllStylistes();
         const assignedStylists = allStylists.filter((stylist) =>
@@ -83,7 +82,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
         setStylists(assignedStylists);
       }
 
-      // Charger les produits associés
       if (serviceData?.produitsIds?.length > 0) {
         const serviceProducts = await getProductsByIds(serviceData.produitsIds);
         setProducts(serviceProducts);
@@ -98,13 +96,11 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
 
   const loadReviews = async () => {
     try {
-      // Charger uniquement les avis avec status "approved" (visible: true)
       const reviewsData = await getReviewsByService(serviceId, true);
       setReviews(reviewsData);
     } catch (error) {
       console.error("Erreur chargement avis:", error);
-      // Ne pas afficher d'alerte pour ne pas perturber l'utilisateur
-      // On laisse simplement les avis vides
+      
       setReviews([]);
     }
   };
@@ -128,7 +124,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
     setBookingModalVisible(true);
   };
 
-  // Fonction pour charger les créneaux disponibles
   const loadAvailableSlots = async () => {
     if (!selectedDate) return;
 
@@ -144,7 +139,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
     }
   };
 
-  // Fonction pour réserver le rendez-vous
   const handleConfirmBooking = async () => {
     if (!selectedDate || !selectedTime) {
       Alert.alert("Erreur", "Veuillez sélectionner une date et une heure");
@@ -154,7 +148,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
     try {
       setBookingInProgress(true);
 
-      // Vérifier la disponibilité une dernière fois
       const availability = await checkAvailability(
         serviceId,
         selectedDate,
@@ -179,7 +172,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
         return;
       }
 
-      // Créer le rendez-vous
       const clientName =
         `${userData?.prenom || ""} ${userData?.nom || ""}`.trim() ||
         userData?.email ||
@@ -194,7 +186,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
         notes: appointmentNotes,
       });
 
-      // Réinitialiser le formulaire
       setSelectedDate("");
       setSelectedTime("");
       setAppointmentNotes("");
@@ -206,7 +197,7 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
         [
           {
             text: "Voir mes rendez-vous",
-            onPress: () => navigation.navigate("Appointments"), // Créez cet écran
+            onPress: () => navigation.navigate("Appointments"), 
           },
           {
             text: "OK",
@@ -225,19 +216,15 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
     }
   };
 
-  // Fonction pour générer les prochains jours disponibles
   const generateAvailableDates = () => {
     const dates = [];
     const today = new Date();
 
-    // Générer les 30 prochains jours
     for (let i = 1; i <= 30; i++) {
       const date = new Date();
       date.setDate(today.getDate() + i);
 
-      // Exclure les dimanches si nécessaire
       if (date.getDay() !== 0) {
-        // 0 = dimanche
         dates.push({
           value: date.toISOString().split("T")[0],
           label: date.toLocaleDateString("fr-FR", {
@@ -284,7 +271,7 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
         clientName,
         clientId: userData?.uid,
         date: new Date().toISOString().split("T")[0],
-        status: "pending", // En attente de validation admin
+        status: "pending",
       });
 
       Alert.alert(
@@ -296,7 +283,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
             onPress: () => {
               setReviewModalVisible(false);
               setNewReview({ rating: 5, comment: "" });
-              // Recharger les avis après un court délai
               setTimeout(() => {
                 loadReviews();
               }, 1000);
@@ -376,7 +362,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
       <Image
         source={{ uri: item }}
         style={styles.thumbnailImage}
-        // defaultSource={require('../../../assets/placeholder-image.png')}
       />
     </TouchableOpacity>
   );
@@ -427,7 +412,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header avec informations principales */}
         <View style={styles.header}>
           <Text style={styles.serviceTitle}>{service.nom}</Text>
           <Text style={styles.servicePrice}>{service.prix}MAD</Text>
@@ -445,7 +429,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
           </View>
         </View>
 
-        {/* Description */}
         {service.description && (
           <View style={styles.descriptionCard}>
             <Text style={styles.sectionTitle}>Description</Text>
@@ -453,7 +436,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
           </View>
         )}
 
-        {/* Section Produits utilisés */}
         {products.length > 0 && (
           <View style={styles.productsSection}>
             <Text style={styles.sectionTitle}>Produits utilisés</Text>
@@ -473,7 +455,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
           </View>
         )}
 
-        {/* Section Stylistes */}
         {stylists.length > 0 && (
           <View style={styles.stylistsSection}>
             <Text style={styles.sectionTitle}>Nos spécialistes</Text>
@@ -506,7 +487,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
           </View>
         )}
 
-        {/* Section Galerie d'images - Après les stylistes comme demandé */}
         {service.images && service.images.length > 0 && (
           <View style={styles.gallerySection}>
             <Text style={styles.sectionTitle}>Galerie photos</Text>
@@ -524,7 +504,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
           </View>
         )}
 
-        {/* Section Avis clients */}
         <View style={styles.reviewsSection}>
           <View style={styles.reviewsHeader}>
             <View>
@@ -561,7 +540,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
         </View>
       </ScrollView>
 
-      {/* Bouton de réservation fixe */}
       {userData?.role === "client" && (
         <View style={styles.footer}>
           <TouchableOpacity
@@ -574,7 +552,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
         </View>
       )}
 
-      {/* Modal pour ajouter un avis */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -644,7 +621,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
         </View>
       </Modal>
 
-      {/* Modal pour afficher l'image en grand */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -668,7 +644,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
           )}
         </View>
       </Modal>
-      {/* Modal pour la réservation */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -685,7 +660,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-              {/* Sélection de la date */}
               <Text style={styles.modalSubtitle}>Choisissez une date</Text>
               <ScrollView
                 horizontal
@@ -714,7 +688,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
                 ))}
               </ScrollView>
 
-              {/* Sélection de l'heure */}
               {selectedDate && (
                 <>
                   <Text style={styles.modalSubtitle}>Choisissez une heure</Text>
@@ -756,7 +729,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
                 </>
               )}
 
-              {/* Notes optionnelles */}
               {selectedDate && selectedTime && (
                 <>
                   <Text style={styles.modalSubtitle}>Notes (optionnel)</Text>
@@ -778,7 +750,6 @@ const ServiceDetailsScreen = ({ route, navigation }) => {
                 </>
               )}
 
-              {/* Boutons d'action */}
               <View style={styles.modalButtons}>
                 <TouchableOpacity
                   style={[styles.modalButton, styles.cancelButton]}
@@ -931,7 +902,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   productsList: {
-    // Padding déjà géré par le parent
   },
   productCard: {
     flexDirection: "row",
@@ -997,7 +967,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   stylistsList: {
-    // Padding déjà géré par le parent
   },
   stylistCard: {
     flexDirection: "row",
@@ -1112,7 +1081,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   reviewsList: {
-    // Padding déjà géré par le parent
   },
   reviewCard: {
     backgroundColor: "#f8f9fa",
@@ -1190,7 +1158,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 10,
   },
-  // Styles pour la modal d'avis
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -1296,7 +1263,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  // Styles pour la modal d'image
   imageModalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.9)",
@@ -1314,7 +1280,6 @@ const styles = StyleSheet.create({
     height: width * 0.9,
     borderRadius: 10,
   },
-  // Styles pour le modal de réservation
   datesScrollView: {
     marginBottom: 20,
   },

@@ -1,4 +1,3 @@
-// screens/admin/appointments/AppointmentList.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -65,12 +64,10 @@ const AppointmentList = ({ navigation }) => {
   const filterAppointments = () => {
     let filtered = [...appointments];
 
-    // Filtre par statut
     if (statusFilter !== "all") {
       filtered = filtered.filter((app) => app.status === statusFilter);
     }
 
-    // Filtre par recherche
     if (searchText.trim() !== "") {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter(
@@ -424,7 +421,6 @@ const AppointmentList = ({ navigation }) => {
         )}
       </ScrollView>
 
-      {/* Modal d'actions */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -505,7 +501,6 @@ const AppointmentList = ({ navigation }) => {
         </View>
       </Modal>
 
-      {/* Modal de confirmation d'annulation */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -640,7 +635,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 22,
   },
-  // Modal styles
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

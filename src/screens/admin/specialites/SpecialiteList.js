@@ -1,4 +1,3 @@
-// screens/admin/SpecialiteList.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -12,7 +11,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-// En haut du fichier SpecialiteList.js et SpecialiteForm.js
 import {
   getAllSpecialites,
   deleteSpecialite,
@@ -30,15 +28,11 @@ const SpecialiteList = ({ navigation }) => {
     }, [])
   );
 
-  // Remplacer la fonction loadSpecialites :
   const loadSpecialites = async () => {
     try {
       setLoading(true);
-      const data = await getAllSpecialites(); // Utilise directement la fonction
-      // Ou avec l'objet service :
-      // const data = await specialiteService.getAll();
-
-      // Filtrer pour n'afficher que les spécialités actives
+      const data = await getAllSpecialites(); 
+      
       const activeSpecialites = data.filter(
         (specialite) => specialite.actif !== false
       );
@@ -53,11 +47,10 @@ const SpecialiteList = ({ navigation }) => {
 
   const handleDeleteSpecialite = async (id) => {
     try {
-      setLoading(true); // Ajouter un indicateur de chargement
+      setLoading(true); 
 
       await deleteSpecialite(id);
 
-      // Petit délai pour laisser le temps à l'UI de se mettre à jour
       setTimeout(() => {
         Alert.alert("Succès", "Spécialité supprimée avec succès");
         loadSpecialites();
@@ -65,7 +58,6 @@ const SpecialiteList = ({ navigation }) => {
     } catch (error) {
       console.error("Erreur détaillée suppression:", error);
 
-      // Afficher un message d'erreur plus spécifique
       let errorMessage = "Impossible de supprimer la spécialité";
       if (error.message.includes("suppression")) {
         errorMessage = "Erreur lors de la suppression de la spécialité";

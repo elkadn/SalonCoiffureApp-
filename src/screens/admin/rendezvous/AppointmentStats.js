@@ -1,4 +1,3 @@
-// screens/admin/statistics/AppointmentStats.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -20,7 +19,7 @@ const { width } = Dimensions.get('window');
 const AppointmentStats = ({ navigation }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState('month'); // day, week, month, year
+  const [timeRange, setTimeRange] = useState('month'); 
 
   useEffect(() => {
     loadStats();
@@ -41,7 +40,6 @@ const AppointmentStats = ({ navigation }) => {
     const now = new Date();
     let filteredAppointments = [...appointments];
 
-    // Filtrer par période
     if (timeRange === 'day') {
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       filteredAppointments = appointments.filter(app => {
@@ -73,7 +71,6 @@ const AppointmentStats = ({ navigation }) => {
     
     const avgRevenue = completedCount > 0 ? totalRevenue / completedCount : 0;
     
-    // Group by stylist
     const stylistStats = {};
     filteredAppointments.forEach(app => {
       if (app.status === 'completed') {
@@ -89,7 +86,6 @@ const AppointmentStats = ({ navigation }) => {
       }
     });
 
-    // Group by service
     const serviceStats = {};
     filteredAppointments.forEach(app => {
       if (app.status === 'completed') {
@@ -198,7 +194,6 @@ const AppointmentStats = ({ navigation }) => {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Statistiques principales */}
         <View style={styles.statsGrid}>
           {renderStatCard(
             "Rendez-vous",
@@ -230,13 +225,10 @@ const AppointmentStats = ({ navigation }) => {
           )}
         </View>
 
-        {/* Top stylistes */}
         {renderTopCard("Top Stylistes", stats?.stylistStats || [], 'stylist')}
 
-        {/* Top services */}
         {renderTopCard("Services Populaires", stats?.serviceStats || [], 'service')}
 
-        {/* Dernières visites */}
         <View style={styles.recentVisitsCard}>
           <Text style={styles.recentVisitsTitle}>Dernières visites</Text>
           {stats?.appointments

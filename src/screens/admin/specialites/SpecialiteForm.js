@@ -1,4 +1,3 @@
-// screens/admin/SpecialiteForm.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -12,7 +11,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-// En haut du fichier SpecialiteList.js et SpecialiteForm.js
 import {
   createSpecialite,
   updateSpecialite,
@@ -38,7 +36,7 @@ const SpecialiteForm = ({ navigation, route }) => {
   const loadSpecialite = async () => {
     try {
       setLoading(true);
-      const specialite = await getSpecialiteById(specialiteId); // Utiliser la fonction importée
+      const specialite = await getSpecialiteById(specialiteId); 
       setNom(specialite.nom);
       setDescription(specialite.description || "");
     } catch (error) {
@@ -49,8 +47,7 @@ const SpecialiteForm = ({ navigation, route }) => {
     }
   };
 
-  // Remplacer validateForm :
-  // Modifier la fonction validateForm (ligne ~56) :
+
   const validateForm = async () => {
     const newErrors = {};
 
@@ -60,7 +57,6 @@ const SpecialiteForm = ({ navigation, route }) => {
       newErrors.nom = "Le nom doit contenir au moins 2 caractères";
     } else {
       try {
-        // Ajouter un indicateur de vérification
         if (nom.trim().length >= 2) {
           const isUnique = await checkUniqueName(
             nom.trim(),
@@ -85,7 +81,6 @@ const SpecialiteForm = ({ navigation, route }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Remplacer handleSave :
   const handleSave = async () => {
     if (!(await validateForm())) return;
 
@@ -97,11 +92,9 @@ const SpecialiteForm = ({ navigation, route }) => {
       };
 
       if (isEditMode) {
-        // Utiliser updateSpecialite
         await updateSpecialite(specialiteId, specialiteData);
         Alert.alert("Succès", "Spécialité modifiée avec succès");
       } else {
-        // Utiliser createSpecialite
         await createSpecialite(specialiteData);
         Alert.alert("Succès", "Spécialité créée avec succès");
       }
@@ -140,7 +133,6 @@ const SpecialiteForm = ({ navigation, route }) => {
 
       <ScrollView style={styles.content}>
         <View style={styles.formCard}>
-          {/* Champ Nom */}
           <View style={styles.formGroup}>
             <Text style={styles.label}>
               Nom de la spécialité <Text style={styles.required}>*</Text>
@@ -159,7 +151,6 @@ const SpecialiteForm = ({ navigation, route }) => {
             </Text>
           </View>
 
-          {/* Champ Description */}
           <View style={styles.formGroup}>
             <Text style={styles.label}>Description</Text>
             <TextInput
@@ -180,7 +171,6 @@ const SpecialiteForm = ({ navigation, route }) => {
             </Text>
           </View>
 
-          {/* Informations */}
           <View style={styles.infoBox}>
             <Icon name="info" size={18} color="#666" />
             <Text style={styles.infoText}>
@@ -191,7 +181,6 @@ const SpecialiteForm = ({ navigation, route }) => {
         </View>
       </ScrollView>
 
-      {/* Boutons d'action */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.cancelButton}

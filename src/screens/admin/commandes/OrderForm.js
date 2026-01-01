@@ -34,7 +34,6 @@ const OrderForm = ({ navigation, route }) => {
   const [showProductModal, setShowProductModal] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Charger les fournisseurs et produits
   useEffect(() => {
     loadSuppliers();
     loadProducts();
@@ -42,7 +41,6 @@ const OrderForm = ({ navigation, route }) => {
     if (isEdit) {
       loadOrderData();
     } else {
-      // Générer un numéro de commande
       setOrderNumber(generateOrderNumber());
     }
   }, []);
@@ -98,7 +96,6 @@ const OrderForm = ({ navigation, route }) => {
     return `CMD-${year}${month}${day}-${random}`;
   };
 
-  // Ajouter un produit
   const handleAddProduct = (product) => {
     const existing = selectedProducts.find((p) => p.productId === product.id);
 
@@ -125,7 +122,6 @@ const OrderForm = ({ navigation, route }) => {
     setShowProductModal(false);
   };
 
-  // Mettre à jour la quantité
   const updateQuantity = (productId, newQuantity) => {
     const quantity = parseInt(newQuantity) || 1;
 
@@ -142,19 +138,16 @@ const OrderForm = ({ navigation, route }) => {
     );
   };
 
-  // Supprimer un produit
   const removeProduct = (productId) => {
     setSelectedProducts((prev) =>
       prev.filter((p) => p.productId !== productId)
     );
   };
 
-  // Calculer le total
   const calculateTotal = () => {
     return selectedProducts.reduce((sum, item) => sum + item.totalPrice, 0);
   };
 
-  // Valider le formulaire
   const validateForm = () => {
     if (!selectedSupplier) {
       Alert.alert("Erreur", "Veuillez sélectionner un fournisseur");
@@ -169,7 +162,6 @@ const OrderForm = ({ navigation, route }) => {
     return true;
   };
 
-  // Sauvegarder la commande
   const handleSave = async () => {
     if (!validateForm()) return;
 
@@ -205,7 +197,6 @@ const OrderForm = ({ navigation, route }) => {
     }
   };
 
-  // Rendu d'un produit sélectionné
   const renderSelectedProduct = ({ item }) => (
     <View style={styles.productItem}>
       <View style={styles.productInfo}>
@@ -237,7 +228,6 @@ const OrderForm = ({ navigation, route }) => {
     </View>
   );
 
-  // Rendu d'un produit dans la modale
   const renderProductOption = ({ item }) => (
     <TouchableOpacity
       style={styles.productOption}
@@ -270,7 +260,6 @@ const OrderForm = ({ navigation, route }) => {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Info commande */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Informations Commande</Text>
 
@@ -342,7 +331,6 @@ const OrderForm = ({ navigation, route }) => {
           </View>
         </View>
 
-        {/* Produits */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Produits commandés</Text>
@@ -382,7 +370,6 @@ const OrderForm = ({ navigation, route }) => {
           )}
         </View>
 
-        {/* Bouton sauvegarder */}
         <TouchableOpacity
           style={[styles.saveButton, loading && styles.saveButtonDisabled]}
           onPress={handleSave}
@@ -401,7 +388,6 @@ const OrderForm = ({ navigation, route }) => {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Modale de sélection des produits */}
       <Modal
         visible={showProductModal}
         animationType="slide"

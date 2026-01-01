@@ -1,4 +1,3 @@
-// screens/client/profile/UserProfileScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -45,7 +44,6 @@ const UserProfileScreen = ({ navigation }) => {
     try {
       setLoading(true);
       
-      // Validation
       if (!formData.nom.trim() || !formData.prenom.trim()) {
         Alert.alert("Erreur", "Le nom et prénom sont obligatoires");
         return;
@@ -166,7 +164,6 @@ const UserProfileScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.content}>
-          {/* Informations personnelles */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Informations personnelles</Text>
@@ -203,7 +200,6 @@ const UserProfileScreen = ({ navigation }) => {
             )}
           </View>
 
-          {/* Actions rapides */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Actions</Text>
             
@@ -235,7 +231,6 @@ const UserProfileScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* Section sécurité */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Sécurité</Text>
             
@@ -261,7 +256,6 @@ const UserProfileScreen = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      {/* Modal de confirmation de suppression */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -488,7 +482,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
     marginTop: 10,
   },
-  // Modal styles
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

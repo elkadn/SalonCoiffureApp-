@@ -1,4 +1,3 @@
-// screens/client/promotions/PromotionsScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -31,16 +30,13 @@ const PromotionsScreen = ({ navigation }) => {
     try {
       setLoading(true);
       
-      // Charger les informations du salon
       const salonData = await salonService.getSalonInfo();
       setSalonInfo(salonData);
       
-      // Charger les services pour les associer aux promotions
       const servicesData = await getAllServices();
       const activeServices = servicesData.filter(s => s.actif !== false);
       setServices(activeServices);
       
-      // Générer les promotions dynamiques
       const generatedPromotions = generatePromotions(activeServices, salonData);
       setPromotions(generatedPromotions);
       
@@ -52,13 +48,11 @@ const PromotionsScreen = ({ navigation }) => {
     }
   };
 
-  // Générer des promotions dynamiques basées sur les services et infos salon
   const generatePromotions = (servicesList, salonData) => {
     const currentDate = new Date();
     const nextMonth = new Date();
     nextMonth.setMonth(nextMonth.getMonth() + 1);
     
-    // Promotions fixes
     const fixedPromotions = [
       {
         id: "1",
@@ -109,7 +103,6 @@ const PromotionsScreen = ({ navigation }) => {
       },
     ];
 
-    // Promotion du mois (basée sur les services les moins réservés)
     if (servicesList.length > 0) {
       const monthlyService = servicesList[Math.floor(Math.random() * servicesList.length)];
       fixedPromotions.push({
@@ -132,7 +125,6 @@ const PromotionsScreen = ({ navigation }) => {
       });
     }
 
-    // Promotion anniversaire du salon
     if (salonData?.dateCreation) {
       const salonCreationDate = new Date(salonData.dateCreation);
       const currentMonth = currentDate.getMonth();
@@ -160,7 +152,6 @@ const PromotionsScreen = ({ navigation }) => {
     return fixedPromotions;
   };
 
-  // Formater la date
   const formatDateDisplay = (dateString) => {
     try {
       const date = new Date(dateString);
@@ -170,7 +161,6 @@ const PromotionsScreen = ({ navigation }) => {
     }
   };
 
-  // Calculer les jours restants
   const getDaysRemaining = (endDateString) => {
     try {
       const endDate = new Date(endDateString);
@@ -183,7 +173,6 @@ const PromotionsScreen = ({ navigation }) => {
     }
   };
 
-  // Afficher une promotion
   const renderPromotion = (promotion) => (
     <TouchableOpacity
       key={promotion.id}
@@ -197,7 +186,6 @@ const PromotionsScreen = ({ navigation }) => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        {/* Badge featured */}
         {promotion.featured && (
           <View style={styles.featuredBadge}>
             <Icon name="star" size={14} color="#FFF" />
@@ -205,7 +193,6 @@ const PromotionsScreen = ({ navigation }) => {
           </View>
         )}
 
-        {/* Contenu de la promotion */}
         <View style={styles.promotionHeader}>
           <View style={styles.promotionIconContainer}>
             <Icon name={promotion.icon} size={30} color="#FFF" />
@@ -216,17 +203,14 @@ const PromotionsScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Discount badge */}
         <View style={styles.discountBadge}>
           <Text style={styles.discountText}>{promotion.discount}</Text>
         </View>
 
-        {/* Description */}
         <Text style={styles.promotionDescription}>
           {promotion.description}
         </Text>
 
-        {/* Détails */}
         <View style={styles.promotionDetails}>
           <View style={styles.detailRow}>
             <Icon name="calendar-today" size={16} color="#FFF" />
@@ -242,7 +226,6 @@ const PromotionsScreen = ({ navigation }) => {
             </View>
           )}
 
-          {/* Jours restants */}
           <View style={styles.daysRemainingContainer}>
             <Icon name="timer" size={16} color="#FFF" />
             <Text style={styles.daysRemainingText}>
@@ -253,12 +236,10 @@ const PromotionsScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Bouton d'action */}
         <TouchableOpacity
           style={styles.actionButton}
           onPress={() => {
             if (promotion.applicableServices) {
-              // Naviguer vers les services avec filtre
               navigation.navigate("Services", { 
                 highlightServices: promotion.applicableServices 
               });
@@ -274,7 +255,6 @@ const PromotionsScreen = ({ navigation }) => {
     </TouchableOpacity>
   );
 
-  // Stats des promotions
   const getPromotionStats = () => {
     const activePromotions = promotions.filter(p => getDaysRemaining(p.endDate) > 0);
     const totalDiscount = promotions.reduce((sum, p) => {
@@ -329,7 +309,6 @@ const PromotionsScreen = ({ navigation }) => {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Bannière principale */}
         <LinearGradient
           colors={['#FF6B6B', '#FF8E8E']}
           style={styles.heroBanner}
@@ -345,7 +324,6 @@ const PromotionsScreen = ({ navigation }) => {
           </View>
         </LinearGradient>
 
-        {/* Statistiques rapides */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>{stats.active}</Text>
@@ -363,7 +341,6 @@ const PromotionsScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Instructions */}
         <View style={styles.infoBox}>
           <Icon name="info" size={24} color="#4ECDC4" style={styles.infoIcon} />
           <View style={styles.infoContent}>
@@ -377,7 +354,6 @@ const PromotionsScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Liste des promotions */}
         <Text style={styles.sectionTitle}>Toutes nos promotions</Text>
         
         {promotions.length === 0 ? (
@@ -392,7 +368,6 @@ const PromotionsScreen = ({ navigation }) => {
           promotions.map(renderPromotion)
         )}
 
-        {/* Informations importantes */}
         <View style={styles.importantInfo}>
           <Text style={styles.importantTitle}>Informations importantes</Text>
           <Text style={styles.importantText}>
@@ -403,7 +378,6 @@ const PromotionsScreen = ({ navigation }) => {
           </Text>
         </View>
 
-        {/* Bouton pour réserver */}
         <TouchableOpacity
           style={styles.reservationButton}
           onPress={() => navigation.navigate("Services")}

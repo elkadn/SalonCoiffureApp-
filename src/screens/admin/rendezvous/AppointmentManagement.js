@@ -1,4 +1,3 @@
-// screens/admin/RendezvousManagement.js
 import React from "react";
 import {
   View,

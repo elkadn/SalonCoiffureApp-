@@ -26,7 +26,6 @@ const OrderDetail = ({ navigation, route }) => {
   const [newStatus, setNewStatus] = useState('');
   const [statusNotes, setStatusNotes] = useState('');
 
-  // Charger les détails de la commande
   useEffect(() => {
     loadOrderDetails();
   }, []);
@@ -47,7 +46,6 @@ const OrderDetail = ({ navigation, route }) => {
     }
   };
 
-  // Formater la date
   const formatDate = (timestamp) => {
     if (!timestamp) return 'N/A';
     try {
@@ -58,7 +56,6 @@ const OrderDetail = ({ navigation, route }) => {
     }
   };
 
-  // Obtenir la couleur du statut
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return '#FF9800';
@@ -69,7 +66,6 @@ const OrderDetail = ({ navigation, route }) => {
     }
   };
 
-  // Obtenir le texte du statut
   const getStatusText = (status) => {
     switch (status) {
       case 'pending': return 'En attente';
@@ -80,7 +76,6 @@ const OrderDetail = ({ navigation, route }) => {
     }
   };
 
-  // Obtenir l'icône du statut
   const getStatusIcon = (status) => {
     switch (status) {
       case 'pending': return 'hourglass-empty';
@@ -91,7 +86,6 @@ const OrderDetail = ({ navigation, route }) => {
     }
   };
 
-  // Confirmer la suppression
   const confirmDelete = () => {
     Alert.alert(
       'Supprimer la commande',
@@ -107,7 +101,6 @@ const OrderDetail = ({ navigation, route }) => {
     );
   };
 
-  // Supprimer la commande
   const handleDelete = async () => {
     try {
       await orderService.deleteOrder(orderId);
@@ -119,7 +112,6 @@ const OrderDetail = ({ navigation, route }) => {
     }
   };
 
-  // Mettre à jour le statut
   const handleUpdateStatus = async () => {
     if (!newStatus || newStatus === order?.status) {
       Alert.alert('Information', 'Aucun changement de statut');
@@ -131,7 +123,6 @@ const OrderDetail = ({ navigation, route }) => {
       setUpdatingStatus(true);
       await orderService.updateOrderStatus(orderId, newStatus, statusNotes);
       
-      // Recharger les données
       await loadOrderDetails();
       
       Alert.alert('Succès', 'Statut mis à jour avec succès');
@@ -145,7 +136,6 @@ const OrderDetail = ({ navigation, route }) => {
     }
   };
 
-  // Confirmer réception (livraison)
   const confirmDelivery = () => {
     Alert.alert(
       'Confirmer la livraison',
@@ -163,7 +153,6 @@ const OrderDetail = ({ navigation, route }) => {
     );
   };
 
-  // Afficher les boutons d'action selon le statut
   const renderActionButtons = () => {
     if (!order) return null;
 
@@ -211,7 +200,6 @@ const OrderDetail = ({ navigation, route }) => {
     );
   };
 
-  // Rendu d'un produit
   const renderProductItem = (item, index) => (
     <View key={item.productId || index} style={styles.productItem}>
       <View style={styles.productHeader}>
@@ -307,7 +295,6 @@ const OrderDetail = ({ navigation, route }) => {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Carte de statut */}
         <View style={styles.statusCard}>
           <View style={[styles.statusIconContainer, { backgroundColor: getStatusColor(order.status) }]}>
             <Icon name={getStatusIcon(order.status)} size={30} color="#fff" />
@@ -323,7 +310,6 @@ const OrderDetail = ({ navigation, route }) => {
           </View>
         </View>
 
-        {/* Informations générales */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Informations</Text>
           
@@ -364,7 +350,6 @@ const OrderDetail = ({ navigation, route }) => {
           )}
         </View>
 
-        {/* Produits */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Produits</Text>
@@ -388,11 +373,9 @@ const OrderDetail = ({ navigation, route }) => {
           </View>
         </View>
 
-        {/* Actions */}
         {renderActionButtons()}
       </ScrollView>
 
-      {/* Modal de changement de statut */}
       <Modal
         visible={showStatusModal}
         animationType="slide"

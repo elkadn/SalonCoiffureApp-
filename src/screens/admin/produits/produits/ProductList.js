@@ -1,4 +1,3 @@
-// screens/admin/ProductList.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -71,7 +70,6 @@ const ProductList = ({ navigation }) => {
     try {
       setLoading(true);
       const data = await productService.getAllProducts();
-      // Filtrer uniquement les produits actifs
       const activeProducts = data.filter((product) => product.actif !== false);
       setProducts(activeProducts);
       setFilteredProducts(activeProducts);
@@ -117,9 +115,9 @@ const ProductList = ({ navigation }) => {
   };
 
   const getStockStatusColor = (quantite, seuilAlerte) => {
-    if (quantite === 0) return "#F44336"; // Rouge pour rupture
-    if (quantite <= seuilAlerte) return "#FF9800"; // Orange pour alerte
-    return "#4CAF50"; // Vert pour bon stock
+    if (quantite === 0) return "#F44336"; 
+    if (quantite <= seuilAlerte) return "#FF9800"; 
+    return "#4CAF50";
   };
 
   const getStockStatusText = (quantite, seuilAlerte) => {
@@ -155,7 +153,6 @@ const ProductList = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Barre de recherche et filtres */}
       <View style={styles.filterContainer}>
         <View style={styles.searchContainer}>
           <Icon
@@ -256,7 +253,6 @@ const ProductList = ({ navigation }) => {
                 navigation.navigate("ProductForm", { productId: product.id })
               }
             >
-              {/* Image du produit */}
               <View style={styles.productImageContainer}>
                 {product.localImagePath ? (
                   <TouchableOpacity
@@ -288,7 +284,6 @@ const ProductList = ({ navigation }) => {
                 )}
               </View>
 
-              {/* Informations du produit */}
               <View style={styles.productInfo}>
                 <View style={styles.productHeader}>
                   <Text style={styles.productName} numberOfLines={1}>
@@ -342,7 +337,6 @@ const ProductList = ({ navigation }) => {
                 </View>
               </View>
 
-              {/* Bouton d'action */}
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={() =>

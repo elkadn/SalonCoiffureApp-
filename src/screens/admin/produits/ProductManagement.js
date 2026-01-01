@@ -1,4 +1,3 @@
-// screens/admin/ProductManagement.js
 import React from "react";
 import {
   View,
@@ -43,14 +42,14 @@ const ProductManagement = ({ navigation }) => {
     {
       title: "Gestion des Commandes",
       description: "Créer et suivre les commandes fournisseurs",
-      screen: "OrderList", // Nouvel écran
+      screen: "OrderList",
       icon: "shopping-cart",
       color: "#FF5722",
     },
     {
       title: "Nouvelle Commande",
       description: "Créer une nouvelle commande fournisseur",
-      screen: "OrderForm", // Nouvel écran
+      screen: "OrderForm", 
       icon: "add-shopping-cart",
       color: "#795548",
     },

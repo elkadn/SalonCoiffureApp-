@@ -1,4 +1,3 @@
-// screens/admin/AffectSpecialites.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -41,7 +40,6 @@ const AffectSpecialites = ({ navigation, route }) => {
     try {
       setLoading(true);
       
-      // Récupérer les spécialités avec info d'affectation
       const specialitesWithAffectation = await getSpecialitesWithAffectation(stylisteUid);
       
       const selectedIds = specialitesWithAffectation

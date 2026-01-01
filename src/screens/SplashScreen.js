@@ -1,4 +1,3 @@
-// screens/SplashScreen.js - VERSION DYNAMIQUE
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ActivityIndicator, Image } from "react-native";
 import { salonService } from "../services/salonService";
@@ -12,7 +11,6 @@ const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const initialize = async () => {
       try {
-        // 1. Charger les informations du salon
         setLoadingText("Chargement du salon...");
         const salonInfo = await salonService.getSalonInfo();
         setSalonName(salonInfo.nom);
@@ -28,18 +26,15 @@ const SplashScreen = ({ navigation }) => {
           }
         }
 
-        // 3. Simulation de chargement
         setTimeout(() => {
           setLoadingText("Préparation de l'application...");
         }, 500);
 
-        // 4. Navigation
         setTimeout(() => {
           navigation.replace("Main");
         }, 2000);
       } catch (error) {
         console.error("Erreur initialisation:", error);
-        // Fallback si erreur
         setTimeout(() => {
           navigation.replace("Main");
         }, 2000);
@@ -51,13 +46,12 @@ const SplashScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Logo dynamique ou fallback */}
       {logoUri ? (
         <Image
           source={{ uri: logoUri }}
           style={styles.logo}
           resizeMode="contain"
-          onError={() => setLogoUri(null)} // Fallback si erreur
+          onError={() => setLogoUri(null)} 
         />
       ) : (
         <View style={styles.logoFallback}>
@@ -72,7 +66,6 @@ const SplashScreen = ({ navigation }) => {
 
       <Text style={styles.loadingText}>{loadingText}</Text>
 
-      {/* Information du salon */}
       {salonName && (
         <View style={styles.salonInfo}>
           <Text style={styles.salonName}>{salonName}</Text>

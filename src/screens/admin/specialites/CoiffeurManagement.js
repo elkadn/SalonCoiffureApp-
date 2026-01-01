@@ -1,4 +1,3 @@
-// screens/admin/CoiffeurManagement.js
 import React from "react";
 import {
   View,

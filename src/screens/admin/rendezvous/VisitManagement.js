@@ -1,4 +1,3 @@
-// screens/admin/visits/VisitManagement.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -33,7 +32,6 @@ const VisitManagement = ({ navigation }) => {
       const appointmentsData = await getAllAppointments();
       setAppointments(appointmentsData);
       
-      // Filtrer les rendez-vous terminés (visites)
       const completedAppointments = appointmentsData.filter(
         app => app.status === 'completed'
       );
@@ -196,7 +194,6 @@ const VisitManagement = ({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Section Visites effectuées */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Icon name="check-circle" size={24} color="#4CAF50" />
@@ -213,7 +210,6 @@ const VisitManagement = ({ navigation }) => {
           )}
         </View>
 
-        {/* Section Rendez-vous à venir */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Icon name="event" size={24} color="#FF9800" />

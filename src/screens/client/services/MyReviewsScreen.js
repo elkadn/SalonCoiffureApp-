@@ -1,4 +1,3 @@
-// screens/client/reviews/MyReviewsScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -35,7 +34,6 @@ const MyReviewsScreen = ({ navigation }) => {
       if (!userData?.email) return;
 
       const allReviews = await getAllReviews();
-      // Filtrer les avis de l'utilisateur connecté
       const userReviews = allReviews.filter(
         (review) =>
           review.clientName.includes(userData.prenom) ||
@@ -62,14 +60,12 @@ const MyReviewsScreen = ({ navigation }) => {
     if (!selectedReview || !userData?.uid) return;
 
     try {
-      // Appeler la fonction deleteReview avec vérification de propriétaire
       await deleteReview(selectedReview.id, userData.uid);
 
       Alert.alert("Succès", "L'avis a été supprimé avec succès", [
         {
           text: "OK",
           onPress: () => {
-            // Recharger la liste
             loadReviews();
           },
         },
@@ -86,10 +82,7 @@ const MyReviewsScreen = ({ navigation }) => {
     }
   };
 
-  // Modifiez la fonction canDeleteReview
   const canDeleteReview = (review) => {
-    // L'utilisateur peut supprimer son avis s'il est en attente ou approuvé
-    // ET s'il est le propriétaire (vérifié par clientId)
     return (
       (review.status === "pending" || review.status === "approved") &&
       review.clientId === userData?.uid
@@ -99,11 +92,11 @@ const MyReviewsScreen = ({ navigation }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case "approved":
-        return "#4CAF50"; // Vert
+        return "#4CAF50"; 
       case "pending":
-        return "#FF9800"; // Orange
+        return "#FF9800"; 
       case "rejected":
-        return "#F44336"; // Rouge
+        return "#F44336"; 
       default:
         return "#666";
     }
@@ -274,7 +267,6 @@ const MyReviewsScreen = ({ navigation }) => {
         )}
       </ScrollView>
 
-      {/* Modal de confirmation de suppression */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -498,7 +490,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  // Modal styles
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

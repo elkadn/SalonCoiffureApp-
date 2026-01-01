@@ -22,7 +22,6 @@ const UserFormScreen = ({ navigation, route }) => {
   const { userId } = route.params || {};
   const isEditing = !!userId;
 
-  // Liste des postes disponibles pour les assistantes
   const postesOptions = [
     { id: "receptionniste", label: "Réceptionniste" },
     { id: "assistante_coiffeur", label: "Assistante coiffeur" },
@@ -32,7 +31,6 @@ const UserFormScreen = ({ navigation, route }) => {
     { id: "autre", label: "Autre poste" },
   ];
 
-  // État initial avec les champs spécifiques pour chaque rôle
   const [formData, setFormData] = useState({
     nom: "",
     prenom: "",
@@ -40,11 +38,10 @@ const UserFormScreen = ({ navigation, route }) => {
     telephone: "",
     role: "client",
     password: "",
-    actif: true, // Par défaut actif
-    // Champs spécifiques aux rôles
-    pointsFidelite: "0", // Pour les clients
-    experience: "", // Pour les stylistes (nombre d'années)
-    poste: "", // Pour les assistantes
+    actif: true, 
+    pointsFidelite: "0", 
+    experience: "", 
+    poste: "", 
   });
 
   const [loading, setLoading] = useState(false);
@@ -68,8 +65,7 @@ const UserFormScreen = ({ navigation, route }) => {
           telephone: user.telephone || "",
           role: user.role || "client",
           password: "",
-          // AJOUTE cette ligne :
-          actif: user.actif !== false, // Si non défini, true par défaut
+          actif: user.actif !== false, 
           pointsFidelite: user.pointsFidelite?.toString() || "0",
           experience: user.experience?.toString() || "",
           poste: user.poste || "",
@@ -86,10 +82,8 @@ const UserFormScreen = ({ navigation, route }) => {
     try {
       const newStatus = !formData.actif;
 
-      // Mettre à jour juste le statut
       await updateUser(userId, { actif: newStatus });
 
-      // Mettre à jour l'état local
       setFormData((prev) => ({ ...prev, actif: newStatus }));
 
       Alert.alert(
@@ -112,7 +106,6 @@ const UserFormScreen = ({ navigation, route }) => {
     setFormData((prev) => ({
       ...prev,
       role,
-      // Réinitialiser les champs spécifiques lorsque le rôle change
       pointsFidelite: role === "client" ? "0" : "",
       experience: "",
       poste: "",
@@ -120,7 +113,6 @@ const UserFormScreen = ({ navigation, route }) => {
   };
 
   const validateForm = () => {
-    // Validation des champs de base
     if (!formData.nom || !formData.prenom) {
       Alert.alert("Erreur", "Le nom et prénom sont requis");
       return false;
@@ -147,7 +139,6 @@ const UserFormScreen = ({ navigation, route }) => {
       return false;
     }
 
-    // Validation des champs spécifiques selon le rôle
     if (formData.role === "styliste" && formData.experience) {
       const experienceNum = parseInt(formData.experience);
       if (isNaN(experienceNum) || experienceNum < 0) {
@@ -171,7 +162,6 @@ const UserFormScreen = ({ navigation, route }) => {
 
     setLoading(true);
     try {
-      // Préparer les données à envoyer selon le rôle
       const userData = {
         nom: formData.nom,
         prenom: formData.prenom,
@@ -181,7 +171,6 @@ const UserFormScreen = ({ navigation, route }) => {
         ...(formData.password && { password: formData.password }),
       };
 
-      // Ajouter les champs spécifiques selon le rôle
       switch (formData.role) {
         case "client":
           userData.pointsFidelite = parseInt(formData.pointsFidelite) || 0;
@@ -271,7 +260,6 @@ const UserFormScreen = ({ navigation, route }) => {
               required: true,
             })}
 
-          {/* Sélecteur de rôle avec les 4 options */}
           <View style={styles.formGroup}>
             <Text style={styles.label}>Rôle *</Text>
             <View style={styles.roleSelector}>
@@ -303,30 +291,26 @@ const UserFormScreen = ({ navigation, route }) => {
             </View>
           </View>
 
-          {/* Champs spécifiques selon le rôle */}
 
-          {/* Pour les clients : Points de fidélité */}
           {formData.role === "client" &&
             renderField("Points de fidélité", "pointsFidelite", "0", {
               keyboardType: "numeric",
-              editable: false, // Initialisé à 0 et non modifiable à la création
+              editable: false, 
             })}
 
-          {/* Pour les stylistes : Années d'expérience */}
           {formData.role === "styliste" &&
             renderField("Années d'expérience", "experience", "0", {
               required: true,
               keyboardType: "numeric",
             })}
 
-          {/* Pour les assistantes : Poste */}
-          {/* Pour les assistantes : Poste - CORRIGE CETTE PARTIE : */}
+         
           {formData.role === "assistante" && (
             <View style={styles.formGroup}>
               <Text style={styles.label}>Poste *</Text>
               <TouchableOpacity
                 style={styles.selectInput}
-                onPress={() => setModalPosteVisible(true)} // SIMPLIFIE ICI
+                onPress={() => setModalPosteVisible(true)} 
               >
                 <Text
                   style={[
@@ -362,7 +346,6 @@ const UserFormScreen = ({ navigation, route }) => {
         </View>
       </ScrollView>
 
-      {/* Modal pour sélectionner le poste */}
       <Modal
         visible={modalPosteVisible}
         animationType="slide"

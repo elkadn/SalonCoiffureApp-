@@ -1,4 +1,3 @@
-// screens/admin/SupplierList.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -25,12 +24,11 @@ const SupplierList = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState("");
 
-  // Utiliser useFocusEffect pour recharger automatiquement
   useFocusEffect(
     useCallback(() => {
       loadSuppliers();
       return () => {
-        // Cleanup si nécessaire
+       
       };
     }, [])
   );
@@ -52,7 +50,6 @@ const SupplierList = ({ navigation }) => {
     try {
       setLoading(true);
       const data = await productService.getAllSuppliers();
-      // Filtrer uniquement les fournisseurs actifs
       const activeSuppliers = data.filter(supplier => supplier.actif !== false);
       setSuppliers(activeSuppliers);
       setFilteredSuppliers(activeSuppliers);
@@ -86,12 +83,10 @@ const SupplierList = ({ navigation }) => {
 
   const deleteSupplier = async (id) => {
     try {
-      // Vérifier si le fournisseur a des produits
-      // Note: Vous devrez peut-être implémenter getProductsBySupplier dans le service
-      // Pour l'instant, on supprime directement
+   
       await deleteDoc(doc(db, "suppliers", id));
       Alert.alert("Succès", "Fournisseur supprimé avec succès");
-      loadSuppliers(); // Recharger la liste
+      loadSuppliers(); 
     } catch (error) {
       Alert.alert("Erreur", error.message || "Impossible de supprimer le fournisseur");
     }

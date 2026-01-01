@@ -171,7 +171,6 @@ const AppointmentDetail = ({ navigation, route }) => {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Carte de statut */}
         <View style={styles.statusCard}>
           <Text style={styles.serviceName}>{appointment.serviceName}</Text>
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(appointment.status) }]}>
@@ -179,7 +178,6 @@ const AppointmentDetail = ({ navigation, route }) => {
           </View>
         </View>
 
-        {/* Informations du rendez-vous */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Informations du rendez-vous</Text>
           
@@ -243,7 +241,6 @@ const AppointmentDetail = ({ navigation, route }) => {
           )}
         </View>
 
-        {/* Informations client */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Client</Text>
           
@@ -284,7 +281,6 @@ const AppointmentDetail = ({ navigation, route }) => {
           )}
         </View>
 
-        {/* Informations styliste */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Styliste</Text>
           
@@ -297,7 +293,6 @@ const AppointmentDetail = ({ navigation, route }) => {
           </View>
         </View>
 
-        {/* Notes */}
         {appointment.notes && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Notes</Text>
@@ -308,7 +303,6 @@ const AppointmentDetail = ({ navigation, route }) => {
           </View>
         )}
 
-        {/* Informations techniques */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Informations techniques</Text>
           
@@ -341,13 +335,7 @@ const AppointmentDetail = ({ navigation, route }) => {
           )}
         </View>
 
-        {/* Boutons d'action */}
         <View style={styles.actionsContainer}>
-          {/* Vous pouvez ajouter des boutons d'action ici si besoin
-          <TouchableOpacity style={styles.actionButton}>
-            <Text style={styles.actionButtonText}>Marquer comme terminé</Text>
-          </TouchableOpacity>
-          */}
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -1,4 +1,3 @@
-// screens/admin/SalonSettingsScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -73,11 +72,11 @@ const SalonSettingsScreen = ({ navigation }) => {
       const imageUri = await pickImage();
       if (imageUri) {
         setSaving(true);
-        const logoUrl = await salonService.saveSalonLogo(imageUri); // Changé de logoPath à logoUrl
+        const logoUrl = await salonService.saveSalonLogo(imageUri); 
         setFormData((prev) => ({
           ...prev,
           logoUrl,
-          logoPath: logoUrl, // Pour compatibilité
+          logoPath: logoUrl, 
         }));
         Alert.alert("Succès", "Logo mis à jour sur Cloudinary");
       }
@@ -122,7 +121,7 @@ const SalonSettingsScreen = ({ navigation }) => {
     try {
       await salonService.updateSalonInfo(formData);
       Alert.alert("Succès", "Paramètres mis à jour");
-      loadSalonInfo(); // Recharger les données
+      loadSalonInfo(); 
     } catch (error) {
       Alert.alert("Erreur", error.message || "Impossible de sauvegarder");
     } finally {
@@ -176,7 +175,6 @@ const SalonSettingsScreen = ({ navigation }) => {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Section Logo */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Logo du Salon</Text>
           <View style={styles.logoSection}>
@@ -219,7 +217,6 @@ const SalonSettingsScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Section Informations de base */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Informations de base</Text>
 
@@ -259,7 +256,6 @@ const SalonSettingsScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Section Contact */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Coordonnées</Text>
 
@@ -289,7 +285,6 @@ const SalonSettingsScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Section Horaires */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Horaires d'ouverture</Text>
 
@@ -310,7 +305,6 @@ const SalonSettingsScreen = ({ navigation }) => {
           ))}
         </View>
 
-        {/* Section Réseaux sociaux */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Réseaux sociaux</Text>
 
@@ -375,7 +369,6 @@ const SalonSettingsScreen = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      {/* Modal pour modifier les horaires */}
       <Modal
         visible={showHoursModal}
         transparent={true}
@@ -604,7 +597,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  // Styles pour le modal
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",

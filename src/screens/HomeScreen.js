@@ -26,7 +26,7 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     loadFeaturedServices();
-    loadSalonInfo(); // ← Appeler la fonction
+    loadSalonInfo(); 
   }, []);
 
   const loadSalonInfo = async () => {
@@ -44,7 +44,6 @@ const HomeScreen = ({ navigation }) => {
   const loadFeaturedServices = async () => {
     try {
       const services = await getAllServices();
-      // Prendre les 4 premiers services actifs comme services en vedette
       const featured = services
         .filter((service) => service.actif !== false)
         .slice(0, 4);
@@ -56,7 +55,6 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // Données des pubs
   const promotions = [
     {
       id: "1",
@@ -110,7 +108,6 @@ const HomeScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
         <View style={styles.header}>
           <Text style={styles.welcomeTitle}>
             {salonInfo?.nom || "Salon Élégance"}
@@ -120,7 +117,6 @@ const HomeScreen = ({ navigation }) => {
           </Text>
         </View>
 
-        {/* Section promotions */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Promotions du moment</Text>
@@ -138,8 +134,6 @@ const HomeScreen = ({ navigation }) => {
           />
         </View>
 
-        {/* Section fonctionnalités */}
-        {/* Section fonctionnalités (CLIENT SEULEMENT) */}
         {userData?.role === "client" && (
           <View style={styles.featuresSection}>
             <TouchableOpacity
@@ -171,7 +165,6 @@ const HomeScreen = ({ navigation }) => {
           </View>
         )}
 
-        {/* Section services populaires */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Services populaires</Text>
@@ -192,7 +185,6 @@ const HomeScreen = ({ navigation }) => {
           )}
         </View>
 
-        {/* Call to Action */}
         <TouchableOpacity
           style={styles.ctaButton}
           onPress={() => navigation.navigate("Services")}
@@ -201,7 +193,6 @@ const HomeScreen = ({ navigation }) => {
           <Ionicons name="arrow-forward" size={20} color="white" />
         </TouchableOpacity>
 
-        {/* Footer info */}
         <View style={styles.infoCard}>
           <Ionicons name="time-outline" size={24} color="#333" />
           <View style={styles.infoTextContainer}>

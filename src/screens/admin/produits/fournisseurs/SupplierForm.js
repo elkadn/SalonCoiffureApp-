@@ -1,4 +1,3 @@
-// screens/admin/SupplierForm.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -61,31 +60,26 @@ const SupplierForm = ({ navigation, route }) => {
   const validateForm = async () => {
     const newErrors = {};
 
-    // Validation du nom
     if (!nom.trim()) {
       newErrors.nom = "Le nom du fournisseur est requis";
     } else if (nom.trim().length < 2) {
       newErrors.nom = "Le nom doit contenir au moins 2 caractères";
     }
 
-    // Validation de l'email
     if (!email.trim()) {
       newErrors.email = "L'email est requis";
     } else if (!isValidEmail(email)) {
       newErrors.email = "Email invalide";
     }
 
-    // Validation du téléphone
     if (telephone && !isValidPhone(telephone)) {
       newErrors.telephone = "Numéro de téléphone invalide";
     }
 
     setErrors(newErrors);
     
-    // Vérifier l'unicité uniquement si pas d'erreurs de validation
     if (Object.keys(newErrors).length === 0) {
       try {
-        // Vérifier si le fournisseur existe déjà (sauf en mode édition)
         if (!isEditMode) {
           const exists = await productService.checkSupplierExists(nom, email);
           if (exists) {
@@ -125,9 +119,6 @@ const SupplierForm = ({ navigation, route }) => {
       };
 
       if (isEditMode) {
-        // Mettre à jour le fournisseur existant
-        // Note: Vous devez implémenter updateSupplier dans le service
-        // Pour l'instant, on utilise une mise à jour directe
         await updateDoc(doc(db, "suppliers", supplierId), {
           ...supplierData,
           dateModification: serverTimestamp()
@@ -138,7 +129,6 @@ const SupplierForm = ({ navigation, route }) => {
         Alert.alert("Succès", "Fournisseur créé avec succès");
       }
 
-      // Retourner à la liste avec un message de succès
       navigation.goBack();
     } catch (error) {
       Alert.alert("Erreur", error.message || "Une erreur est survenue");
@@ -177,7 +167,6 @@ const SupplierForm = ({ navigation, route }) => {
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.formCard}>
-            {/* Champ Nom */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>
                 Nom du fournisseur <Text style={styles.required}>*</Text>
@@ -196,7 +185,6 @@ const SupplierForm = ({ navigation, route }) => {
               </Text>
             </View>
 
-            {/* Champ Email */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>
                 Email <Text style={styles.required}>*</Text>
@@ -217,7 +205,6 @@ const SupplierForm = ({ navigation, route }) => {
               </Text>
             </View>
 
-            {/* Champ Téléphone */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Téléphone</Text>
               <TextInput
@@ -237,7 +224,6 @@ const SupplierForm = ({ navigation, route }) => {
               </Text>
             </View>
 
-            {/* Champ Adresse */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Adresse</Text>
               <TextInput
@@ -258,7 +244,6 @@ const SupplierForm = ({ navigation, route }) => {
               </Text>
             </View>
 
-            {/* Champ Notes */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Notes & Informations</Text>
               <TextInput
@@ -277,7 +262,6 @@ const SupplierForm = ({ navigation, route }) => {
               </Text>
             </View>
 
-            {/* Informations */}
             <View style={styles.infoBox}>
               <Icon name="info" size={18} color="#666" />
               <Text style={styles.infoText}>
@@ -288,7 +272,6 @@ const SupplierForm = ({ navigation, route }) => {
           </View>
         </ScrollView>
 
-        {/* Boutons d'action */}
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.cancelButton}

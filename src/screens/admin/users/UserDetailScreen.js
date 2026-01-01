@@ -49,7 +49,7 @@ const UserDetailScreen = ({ navigation, route }) => {
             try {
               await updateUser(userId, { actif: true });
               Alert.alert("Succès", "Utilisateur activé");
-              loadUserData(); // Recharger les données
+              loadUserData(); 
             } catch (error) {
               Alert.alert("Erreur", "Impossible d'activer l'utilisateur");
             }
@@ -72,7 +72,7 @@ const UserDetailScreen = ({ navigation, route }) => {
             try {
               await updateUser(userId, { actif: false });
               Alert.alert("Succès", "Utilisateur désactivé");
-              loadUserData(); // Recharger les données
+              loadUserData(); 
             } catch (error) {
               Alert.alert("Erreur", "Impossible de désactiver l'utilisateur");
             }
@@ -139,34 +139,27 @@ const UserDetailScreen = ({ navigation, route }) => {
     }
   };
 
-  // PAR cette version corrigée :
   const formatDate = (timestamp) => {
     if (!timestamp) return "Non spécifié";
 
     let date;
 
-    // Si c'est un timestamp Firestore (avec seconds/nanoseconds)
     if (timestamp.seconds !== undefined) {
       date = new Date(timestamp.seconds * 1000);
     }
-    // Si c'est un objet Date standard
     else if (timestamp instanceof Date) {
       date = timestamp;
     }
-    // Si c'est une chaîne de caractères
     else if (typeof timestamp === "string") {
       date = new Date(timestamp);
     }
-    // Si c'est un nombre (timestamp en millisecondes)
     else if (typeof timestamp === "number") {
       date = new Date(timestamp);
     }
-    // Sinon, retourne une valeur par défaut
     else {
       return "Date invalide";
     }
 
-    // Vérifie si la date est valide
     if (isNaN(date.getTime())) {
       return "Date invalide";
     }
@@ -190,7 +183,6 @@ const UserDetailScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -209,7 +201,6 @@ const UserDetailScreen = ({ navigation, route }) => {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Photo/Initiales */}
         <View style={styles.avatarSection}>
           <View style={styles.avatarLarge}>
             <Text style={styles.avatarLargeText}>
@@ -232,7 +223,6 @@ const UserDetailScreen = ({ navigation, route }) => {
           </View>
         </View>
 
-        {/* Informations */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Informations Personnelles</Text>
 
@@ -285,7 +275,6 @@ const UserDetailScreen = ({ navigation, route }) => {
           </View>
         </View>
 
-        {/* Informations spécifiques selon le rôle */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Informations Spécifiques</Text>
 
@@ -337,7 +326,6 @@ const UserDetailScreen = ({ navigation, route }) => {
           )}
         </View>
 
-        {/* Statut */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Statut</Text>
 
@@ -377,7 +365,6 @@ const UserDetailScreen = ({ navigation, route }) => {
           </View>
         </View>
 
-        {/* Actions spécifiques pour les stylistes */}
         {user.role === "styliste" && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Gestion des créneaux</Text>
@@ -409,7 +396,6 @@ const UserDetailScreen = ({ navigation, route }) => {
           </View>
         )}
 
-        {/* NOUVELLE SECTION : Profil capillaire pour les clients */}
         {user.role === "client" && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Profil Capillaire</Text>
@@ -441,9 +427,7 @@ const UserDetailScreen = ({ navigation, route }) => {
           </View>
         )}
 
-        {/* Actions */}
         <View style={styles.actionsSection}>
-          {/* Ajoute ce bouton pour les clients */}
           {user.role === "client" && (
             <TouchableOpacity
               style={[styles.actionButton, styles.profilAction]}
@@ -525,7 +509,6 @@ const UserDetailScreen = ({ navigation, route }) => {
                   "Vous ne pouvez pas modifier votre propre compte"
                 );
               } else {
-                // Si actif, désactiver ; si inactif, activer
                 if (user.actif !== false) {
                   handleDelete();
                 } else {
@@ -781,7 +764,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#4CAF50",
   },
   activateAction: {
-    backgroundColor: "#4CAF50", // Vert pour activer
+    backgroundColor: "#4CAF50", 
   },
 });
 

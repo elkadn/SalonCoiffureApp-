@@ -1,4 +1,3 @@
-// screens/admin/InventoryScreen.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -24,7 +23,7 @@ const InventoryScreen = ({ navigation }) => {
   const [stats, setStats] = useState(null);
   const [lowStockProducts, setLowStockProducts] = useState([]);
   const [outOfStockProducts, setOutOfStockProducts] = useState([]);
-  const [selectedFilter, setSelectedFilter] = useState("all"); // all, low, out, normal
+  const [selectedFilter, setSelectedFilter] = useState("all"); 
   const [filteredProducts, setFilteredProducts] = useState([]);
 
   useFocusEffect(
@@ -38,11 +37,9 @@ const InventoryScreen = ({ navigation }) => {
     try {
       setLoading(true);
       
-      // Charger les statistiques
       const inventoryStats = await productService.getInventoryStats();
       setStats(inventoryStats);
       
-      // Charger les produits en rupture et faible stock
       const [lowStock, outOfStock] = await Promise.all([
         productService.getProductsByStockLevel('low'),
         productService.getProductsByStockLevel('out')
@@ -51,7 +48,6 @@ const InventoryScreen = ({ navigation }) => {
       setLowStockProducts(lowStock);
       setOutOfStockProducts(outOfStock);
       
-      // Charger les produits selon le filtre actuel
       const filtered = await productService.getProductsByStockLevel(selectedFilter);
       setFilteredProducts(filtered);
       
@@ -96,7 +92,6 @@ const InventoryScreen = ({ navigation }) => {
 
               await productService.updateProductQuantity(product.id, quantity);
               
-              // Enregistrer le mouvement
               await productService.addStockMovement({
                 productId: product.id,
                 productName: product.nom,
@@ -160,7 +155,6 @@ const InventoryScreen = ({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Statistiques principales */}
         {stats && (
           <View style={styles.statsContainer}>
             <Text style={styles.sectionTitle}>Aperçu de l'Inventaire</Text>
@@ -185,7 +179,6 @@ const InventoryScreen = ({ navigation }) => {
               </View>
             </View>
 
-            {/* Alertes de stock */}
             <View style={styles.alertsContainer}>
               <View style={[styles.alertCard, { backgroundColor: "#FFF3E0" }]}>
                 <Icon name="warning" size={24} color="#FF9800" />
@@ -218,7 +211,6 @@ const InventoryScreen = ({ navigation }) => {
               </View>
             </View>
 
-            {/* Graphique par catégorie (simplifié) */}
             <View style={styles.chartContainer}>
               <Text style={styles.chartTitle}>Valeur par catégorie</Text>
               {stats.categories && stats.categories.length > 0 ? (
@@ -251,7 +243,6 @@ const InventoryScreen = ({ navigation }) => {
           </View>
         )}
 
-        {/* Filtres */}
         <View style={styles.filterContainer}>
           <Text style={styles.sectionTitle}>Filtrer par niveau de stock</Text>
           <View style={styles.filterButtons}>
@@ -289,7 +280,6 @@ const InventoryScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Liste des produits filtrés */}
         <View style={styles.productsContainer}>
           <View style={styles.productsHeader}>
             <Text style={styles.sectionTitle}>
@@ -371,7 +361,6 @@ const InventoryScreen = ({ navigation }) => {
           )}
         </View>
 
-        {/* Actions rapides */}
         <View style={styles.quickActions}>
           <Text style={styles.sectionTitle}>Actions rapides</Text>
           <View style={styles.actionButtons}>
@@ -386,7 +375,6 @@ const InventoryScreen = ({ navigation }) => {
             <TouchableOpacity
               style={[styles.actionButton, { backgroundColor: "#4CAF50" }]}
               onPress={() => {
-                // Vous pouvez créer une page d'import/export plus tard
                 Alert.alert("Info", "Fonction d'import à venir");
               }}
             >
@@ -396,7 +384,6 @@ const InventoryScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Informations */}
         <View style={styles.infoCard}>
           <Icon name="info" size={20} color="#666" />
           <Text style={styles.infoText}>

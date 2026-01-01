@@ -1,4 +1,3 @@
-// screens/admin/ProductForm.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -31,7 +30,6 @@ const ProductForm = ({ navigation, route }) => {
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
 
-  // États pour les données du produit
   const [nom, setNom] = useState("");
   const [code, setCode] = useState("");
   const [description, setDescription] = useState("");
@@ -42,9 +40,9 @@ const ProductForm = ({ navigation, route }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
 
-  const [imageUri, setImageUri] = useState(null); // URI temporaire de l'image sélectionnée
-  const [existingImagePath, setExistingImagePath] = useState(null); // Chemin de l'image existant
-  const [imageUrl, setImageUrl] = useState(null); // AJOUTEZ CETTE LIGNE
+  const [imageUri, setImageUri] = useState(null); 
+  const [existingImagePath, setExistingImagePath] = useState(null); 
+  const [imageUrl, setImageUrl] = useState(null); 
 
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showSupplierModal, setShowSupplierModal] = useState(false);
@@ -82,11 +80,9 @@ const ProductForm = ({ navigation, route }) => {
           setSelectedCategory(product.categorieId);
           setSelectedSupplier(product.fournisseurId);
 
-          // Charger l'URL Cloudinary (priorité) ou l'image locale (compatibilité)
           if (product.imageUrl) {
-            setImageUrl(product.imageUrl); // URL Cloudinary
+            setImageUrl(product.imageUrl); 
           } else if (product.localImagePath) {
-            // Ancien système local - à migrer
             setExistingImagePath(product.localImagePath);
           }
 
@@ -124,7 +120,6 @@ const ProductForm = ({ navigation, route }) => {
     }
   };
 
-  // Fonction handleSave COMPLÈTEMENT MODIFIÉE
   const handleSave = async () => {
     if (!(await validateForm())) return;
 
@@ -152,25 +147,20 @@ const ProductForm = ({ navigation, route }) => {
         fournisseurNom: supplier.nom,
       };
 
-      // === GESTION DES IMAGES CLOUDINARY ===
-      let cloudinaryImageUrl = imageUrl; // Garder l'URL existante par défaut
+      let cloudinaryImageUrl = imageUrl; 
 
       if (imageUri) {
-        // Si une nouvelle image a été sélectionnée
         try {
           console.log("📤 Upload image produit vers Cloudinary...");
 
-          // Déterminer le nom du produit pour le nom de fichier
           const productName = nom.trim().replace(/\s+/g, "_").substring(0, 20);
           const folder = "product_images";
 
-          // Upload vers Cloudinary
           const cloudinaryResult = await uploadProductImage(imageUri, nom);
 
           console.log("✅ Image uploadée:", cloudinaryResult.url);
           cloudinaryImageUrl = cloudinaryResult.url;
 
-          // Stocker aussi le public_id si besoin
           productData.imagePublicId = cloudinaryResult.public_id;
         } catch (imageError) {
           console.error("❌ Erreur upload image Cloudinary:", imageError);
@@ -178,21 +168,18 @@ const ProductForm = ({ navigation, route }) => {
             "Attention",
             "L'image n'a pas pu être uploadée sur Cloudinary, mais le produit sera enregistré."
           );
-          cloudinaryImageUrl = null; // Pas d'image
+          cloudinaryImageUrl = null; 
         }
       }
 
-      // Ajouter l'URL Cloudinary au produit
       if (cloudinaryImageUrl) {
         productData.imageUrl = cloudinaryImageUrl;
       }
 
-      // Supprimer les anciens champs d'images locales
       delete productData.localImagePath;
       delete productData.imagePath;
 
       console.log("💾 Sauvegarde du produit...");
-      // Sauvegarder le produit
       if (isEditMode) {
         await productService.updateProduct(productId, productData);
         Alert.alert("✅ Succès", "Produit modifié avec succès");
@@ -259,7 +246,6 @@ const ProductForm = ({ navigation, route }) => {
       newErrors.seuilAlerte = "Seuil d'alerte invalide";
     }
 
-    // Vérifier l'unicité du code (sauf en mode édition)
     if (code.trim() && !isEditMode) {
       try {
         const exists = await productService.checkProductCodeExists(code);
@@ -276,15 +262,12 @@ const ProductForm = ({ navigation, route }) => {
   };
 
   const renderImage = () => {
-    // Priorité à l'URI temporaire (nouvelle image sélectionnée)
     if (imageUri) {
       return { uri: imageUri };
     }
-    // Sinon, utiliser l'URL Cloudinary existante
     if (imageUrl) {
       return { uri: imageUrl };
     }
-    // Pas d'image
     return null;
   };
 
@@ -328,7 +311,6 @@ const ProductForm = ({ navigation, route }) => {
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.formCard}>
-            {/* Section Image */}
             <View style={styles.imageSection}>
               <Text style={styles.sectionTitle}>Image du produit</Text>
               <TouchableOpacity
@@ -359,11 +341,9 @@ const ProductForm = ({ navigation, route }) => {
               </TouchableOpacity>
             </View>
 
-            {/* Informations de base */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Informations de base</Text>
 
-              {/* Nom */}
               <View style={styles.formGroup}>
                 <Text style={styles.label}>
                   Nom du produit <Text style={styles.required}>*</Text>
@@ -381,7 +361,6 @@ const ProductForm = ({ navigation, route }) => {
                 )}
               </View>
 
-              {/* Code */}
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Code produit</Text>
                 <TextInput
@@ -400,7 +379,6 @@ const ProductForm = ({ navigation, route }) => {
                 </Text>
               </View>
 
-              {/* Description */}
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Description</Text>
                 <TextInput
@@ -425,11 +403,9 @@ const ProductForm = ({ navigation, route }) => {
               </View>
             </View>
 
-            {/* Catégorie et Fournisseur */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Classification</Text>
 
-              {/* Catégorie */}
               <View style={styles.formGroup}>
                 <Text style={styles.label}>
                   Catégorie <Text style={styles.required}>*</Text>
@@ -458,7 +434,6 @@ const ProductForm = ({ navigation, route }) => {
                 )}
               </View>
 
-              {/* Fournisseur */}
               <View style={styles.formGroup}>
                 <Text style={styles.label}>
                   Fournisseur <Text style={styles.required}>*</Text>
@@ -488,12 +463,10 @@ const ProductForm = ({ navigation, route }) => {
               </View>
             </View>
 
-            {/* Prix et Stock */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Prix & Stock</Text>
 
               <View style={styles.row}>
-                {/* Prix d'achat */}
                 <View style={[styles.formGroup, { flex: 1, marginRight: 10 }]}>
                   <Text style={styles.label}>
                     Prix d'achat (€) <Text style={styles.required}>*</Text>
@@ -514,7 +487,6 @@ const ProductForm = ({ navigation, route }) => {
                   )}
                 </View>
 
-                {/* Prix de vente */}
                 <View style={[styles.formGroup, { flex: 1 }]}>
                   <Text style={styles.label}>
                     Prix de vente (€) <Text style={styles.required}>*</Text>
@@ -537,7 +509,6 @@ const ProductForm = ({ navigation, route }) => {
               </View>
 
               <View style={styles.row}>
-                {/* Quantité */}
                 <View style={[styles.formGroup, { flex: 1, marginRight: 10 }]}>
                   <Text style={styles.label}>
                     Quantité en stock <Text style={styles.required}>*</Text>
@@ -555,7 +526,6 @@ const ProductForm = ({ navigation, route }) => {
                   )}
                 </View>
 
-                {/* Seuil d'alerte */}
                 <View style={[styles.formGroup, { flex: 1 }]}>
                   <Text style={styles.label}>
                     Seuil d'alerte <Text style={styles.required}>*</Text>
@@ -583,7 +553,6 @@ const ProductForm = ({ navigation, route }) => {
           </View>
         </ScrollView>
 
-        {/* Boutons d'action */}
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.cancelButton}
@@ -615,7 +584,6 @@ const ProductForm = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Modal Catégories */}
         <Modal
           visible={showCategoryModal}
           animationType="slide"
@@ -674,7 +642,6 @@ const ProductForm = ({ navigation, route }) => {
           </View>
         </Modal>
 
-        {/* Modal Fournisseurs */}
         <Modal
           visible={showSupplierModal}
           animationType="slide"
@@ -938,7 +905,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  // Styles pour les modals
   modalContainer: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

@@ -45,7 +45,6 @@ const ServicesScreen = ({ navigation }) => {
   const filterServices = () => {
     let filtered = [...services];
 
-    // Filtre par recherche
     if (searchQuery.trim() !== "") {
       filtered = filtered.filter(
         (service) =>
@@ -55,7 +54,6 @@ const ServicesScreen = ({ navigation }) => {
       );
     }
 
-    // Filtre par catégorie
     if (selectedCategory !== "Tous") {
       filtered = filtered.filter(
         (service) => service.categorie === selectedCategory
@@ -65,7 +63,6 @@ const ServicesScreen = ({ navigation }) => {
     setFilteredServices(filtered);
   };
 
-  // Extraire les catégories uniques
   const categories = [
     "Tous",
     ...new Set(services.map((service) => service.categorie || "Non catégorisé")),
@@ -132,7 +129,6 @@ const ServicesScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Nos Services</Text>
         <Text style={styles.headerSubtitle}>
@@ -140,7 +136,6 @@ const ServicesScreen = ({ navigation }) => {
         </Text>
       </View>
 
-      {/* Barre de recherche */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
         <TextInput
@@ -152,7 +147,6 @@ const ServicesScreen = ({ navigation }) => {
         />
       </View>
 
-      {/* Catégories */}
       <View style={styles.categoriesSection}>
         <FlatList
           data={categories}
@@ -164,7 +158,6 @@ const ServicesScreen = ({ navigation }) => {
         />
       </View>
 
-      {/* Liste des services */}
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#FF6B6B" />
@@ -181,7 +174,6 @@ const ServicesScreen = ({ navigation }) => {
         />
       )}
 
-      {/* Compteur */}
       <View style={styles.counterContainer}>
         <Text style={styles.counterText}>
           {filteredServices.length} service{filteredServices.length !== 1 ? "s" : ""}{" "}

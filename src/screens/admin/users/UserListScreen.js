@@ -36,7 +36,6 @@ const UserListScreen = ({ navigation, route }) => {
     loadUsers();
   }, []);
 
-  // Ajoute ce useFocusEffect pour rafraîchir quand on revient sur l'écran
   useFocusEffect(
     React.useCallback(() => {
       loadUsers();
@@ -66,7 +65,6 @@ const UserListScreen = ({ navigation, route }) => {
   const filterUsers = () => {
     let filtered = [...users];
 
-    // Filtrer par recherche
     if (searchText) {
       filtered = filtered.filter(
         (user) =>
@@ -76,7 +74,6 @@ const UserListScreen = ({ navigation, route }) => {
       );
     }
 
-    // Filtrer par rôle
     if (selectedRole !== "all") {
       filtered = filtered.filter((user) => user.role === selectedRole);
     }
@@ -152,140 +149,11 @@ const UserListScreen = ({ navigation, route }) => {
     }
   };
 
-  // const renderUserItem = ({ item }) => (
-  //   <TouchableOpacity
-  //     style={styles.userCard}
-  //     onPress={() => navigation.navigate("UserDetail", { userId: item.id, currentUserId: currentUserId })}
-
-  //   >
-  //     <View style={styles.userInfo}>
-  //       <View style={styles.userHeader}>
-  //         <View style={styles.avatar}>
-  //           <Text style={styles.avatarText}>
-  //             {item.prenom?.[0]}
-  //             {item.nom?.[0]}
-  //           </Text>
-  //         </View>
-  //         <View style={styles.userDetails}>
-  //           <Text style={styles.userName}>
-  //             {item.prenom} {item.nom}
-  //           </Text>
-  //           <Text style={styles.userEmail}>{item.email}</Text>
-  //         </View>
-  //       </View>
-
-  //       <View style={styles.userMeta}>
-  //         <View
-  //           style={[
-  //             styles.roleBadge,
-  //             { backgroundColor: getRoleColor(item.role) },
-  //           ]}
-  //         >
-  //           <Text style={styles.roleText}>
-  //             {getRoleIcon(item.role)} {getRoleLabel(item.role)}
-  //           </Text>
-  //         </View>
-
-  //         {/* Afficher les informations spécifiques selon le rôle */}
-  //         {item.role === "client" && item.pointsFidelite !== undefined && (
-  //           <Text style={styles.specificInfo}>
-  //             🎯 {item.pointsFidelite} points
-  //           </Text>
-  //         )}
-
-  //         {item.role === "styliste" && item.experience !== undefined && (
-  //           <Text style={styles.specificInfo}>
-  //             📅 {item.experience} ans exp.
-  //           </Text>
-  //         )}
-
-  //         {item.role === "assistante" && item.poste && (
-  //           <Text style={styles.specificInfo}>💼 {item.poste}</Text>
-  //         )}
-  //       </View>
-  //     </View>
-
-  //     <View style={styles.actions}>
-  //       {item.role === "styliste" && (
-  //         <TouchableOpacity
-  //           style={styles.actionButton}
-  //           onPress={() =>
-  //             navigation.navigate("StylisteCreneaux", {
-  //               stylisteId: item.id,
-  //               stylisteName: `${item.prenom} ${item.nom}`,
-  //             })
-  //           }
-  //         >
-  //           <Icon name="schedule" size={20} color="#FF9800" />
-  //         </TouchableOpacity>
-  //       )}
-
-  //       {item.role === "client" && (
-  //         <TouchableOpacity
-  //           style={styles.actionButton}
-  //           onPress={() =>
-  //             navigation.navigate("ProfilCapillaire", {
-  //               clientId: item.id,
-  //               clientName: `${item.prenom} ${item.nom}`,
-  //             })
-  //           }
-  //         >
-  //           <Icon name="content-cut" size={20} color="#4CAF50" />
-  //         </TouchableOpacity>
-  //       )}
-
-  //       <TouchableOpacity
-  //         style={styles.actionButton}
-  //         onPress={() => {
-  //           // Vérifier si c'est l'utilisateur connecté
-  //           if (item.id === currentUserId) {
-  //             Alert.alert(
-  //               "Information",
-  //               "Vous ne pouvez pas modifier votre propre compte depuis cette interface"
-  //             );
-  //           } else {
-  //             navigation.navigate("UserForm", { userId: item.id });
-  //           }
-  //         }}
-  //         disabled={item.id === currentUserId} // Désactiver le bouton
-  //       >
-  //         <Icon
-  //           name="edit"
-  //           size={20}
-  //           color={item.id === currentUserId ? "#ccc" : "#2196F3"}
-  //         />
-  //       </TouchableOpacity>
-
-  //       {/* Bouton DELETE - ajoute cette condition aussi */}
-  //       <TouchableOpacity
-  //         style={styles.actionButton}
-  //         onPress={() => {
-  //           if (item.id === currentUserId) {
-  //             Alert.alert(
-  //               "Information",
-  //               "Vous ne pouvez pas désactiver votre propre compte"
-  //             );
-  //           } else {
-  //             handleDeleteUser(item.id, `${item.prenom} ${item.nom}`);
-  //           }
-  //         }}
-  //         disabled={item.id === currentUserId}
-  //       >
-  //         <Icon
-  //           name="delete"
-  //           size={20}
-  //           color={item.id === currentUserId ? "#ccc" : "#F44336"}
-  //         />
-  //       </TouchableOpacity>
-  //     </View>
-  //   </TouchableOpacity>
-  // );
-
   const renderUserItem = ({ item }) => (
     <TouchableOpacity
       style={[
         styles.userCard,
-        !item.actif && styles.userCardInactive, // Style pour utilisateur inactif
+        !item.actif && styles.userCardInactive, 
       ]}
       onPress={() =>
         navigation.navigate("UserDetail", {
@@ -301,7 +169,6 @@ const UserListScreen = ({ navigation, route }) => {
               {item.prenom?.[0]}
               {item.nom?.[0]}
             </Text>
-            {/* Badge d'état */}
             {!item.actif && (
               <View style={styles.inactiveBadge}>
                 <Text style={styles.inactiveBadgeText}>X</Text>
@@ -339,7 +206,6 @@ const UserListScreen = ({ navigation, route }) => {
             </Text>
           </View>
 
-          {/* Badge d'état Actif/Inactif */}
           <View
             style={[
               styles.statusBadge,
@@ -351,7 +217,6 @@ const UserListScreen = ({ navigation, route }) => {
             </Text>
           </View>
 
-          {/* Afficher les informations spécifiques selon le rôle */}
           {item.role === "client" && item.pointsFidelite !== undefined && (
             <Text
               style={[
@@ -388,7 +253,6 @@ const UserListScreen = ({ navigation, route }) => {
       </View>
 
       <View style={styles.actions}>
-        {/* Les autres boutons restent inchangés */}
         {item.role === "styliste" && (
           <TouchableOpacity
             style={styles.actionButton}
@@ -419,7 +283,6 @@ const UserListScreen = ({ navigation, route }) => {
         <TouchableOpacity
           style={styles.actionButton}
           onPress={() => {
-            // Vérifier si c'est l'utilisateur connecté
             if (item.id === currentUserId) {
               Alert.alert(
                 "Information",
@@ -429,7 +292,7 @@ const UserListScreen = ({ navigation, route }) => {
               navigation.navigate("UserForm", { userId: item.id });
             }
           }}
-          disabled={item.id === currentUserId} // Désactiver le bouton
+          disabled={item.id === currentUserId} 
         >
           <Icon
             name="edit"
@@ -437,7 +300,6 @@ const UserListScreen = ({ navigation, route }) => {
             color={item.id === currentUserId ? "#ccc" : "#2196F3"}
           />
         </TouchableOpacity>
-        {/* Modifiez le bouton DELETE pour qu'il devienne "Activer" si utilisateur désactivé */}
         <TouchableOpacity
           style={styles.actionButton}
           onPress={() => {
@@ -483,7 +345,7 @@ const UserListScreen = ({ navigation, route }) => {
             try {
               await updateUser(userId, { actif: true });
               Alert.alert("Succès", "Utilisateur activé");
-              loadUsers(); // Recharger la liste
+              loadUsers(); 
             } catch (error) {
               Alert.alert("Erreur", "Impossible d'activer l'utilisateur");
             }
@@ -510,7 +372,6 @@ const UserListScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Utilisateurs</Text>
         <TouchableOpacity
@@ -521,7 +382,6 @@ const UserListScreen = ({ navigation, route }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Filtres */}
       <View style={styles.filterContainer}>
         <View style={styles.searchContainer}>
           <Icon
@@ -630,7 +490,6 @@ const UserListScreen = ({ navigation, route }) => {
         </ScrollView>
       </View>
 
-      {/* Liste */}
       <FlatList
         data={filteredUsers}
         renderItem={renderUserItem}
@@ -847,7 +706,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#e8e8e8",
   },
 
-  // Badge pour avatar inactif
   inactiveBadge: {
     position: "absolute",
     top: -5,
@@ -868,7 +726,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  // Badge d'état Actif/Inactif
   statusBadge: {
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -890,12 +747,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  // Pour le bouton Activer
   activateButton: {
     backgroundColor: "#4CAF50",
   },
 
-  // Vous pouvez aussi ajouter un filtre par état
   filterButtonsContainer: {
     flexDirection: "row",
     marginTop: 10,

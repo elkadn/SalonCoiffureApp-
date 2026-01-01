@@ -20,7 +20,7 @@ const ReviewManagementScreen = ({ navigation }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [filter, setFilter] = useState("all"); // all, pending, approved, rejected
+  const [filter, setFilter] = useState("all"); 
 
   useEffect(() => {
     loadReviews();
@@ -31,7 +31,6 @@ const ReviewManagementScreen = ({ navigation }) => {
       setLoading(true);
       const reviewsData = await getAllReviews();
       
-      // Enrichir les avis avec les informations du service
       const enrichedReviews = await Promise.all(
         reviewsData.map(async (review) => {
           try {
@@ -119,13 +118,13 @@ const ReviewManagementScreen = ({ navigation }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case "approved":
-        return "#4CAF50"; // Vert
+        return "#4CAF50"; 
       case "pending":
-        return "#FF9800"; // Orange
+        return "#FF9800"; 
       case "rejected":
-        return "#F44336"; // Rouge
+        return "#F44336"; 
       default:
-        return "#757575"; // Gris
+        return "#757575"; 
     }
   };
 
@@ -278,7 +277,6 @@ const ReviewManagementScreen = ({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Statistiques */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>{stats.total}</Text>
@@ -298,7 +296,6 @@ const ReviewManagementScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Filtres */}
         <View style={styles.filterContainer}>
           <Text style={styles.filterTitle}>Filtrer par statut:</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -337,7 +334,6 @@ const ReviewManagementScreen = ({ navigation }) => {
           </ScrollView>
         </View>
 
-        {/* Liste des avis */}
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#4CAF50" />

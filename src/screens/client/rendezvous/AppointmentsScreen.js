@@ -44,12 +44,10 @@ const AppointmentsScreen = ({ navigation }) => {
       const formattedDate = format(appointmentDate, "dd/MM/yyyy");
       const formattedTime = format(appointmentDate, "HH:mm");
 
-      // Générer un numéro de facture unique
       const invoiceNumber = `FAC-${appointment.id
         .substring(0, 8)
         .toUpperCase()}`;
 
-      // HTML pour la facture
       const html = `
       <!DOCTYPE html>
       <html>
@@ -230,13 +228,11 @@ const AppointmentsScreen = ({ navigation }) => {
       </html>
     `;
 
-      // Générer le fichier PDF
       const { uri } = await printToFileAsync({
         html: html,
         base64: false,
       });
 
-      // Partager/ouvrir le PDF
       await shareAsync(uri, {
         UTI: ".pdf",
         mimeType: "application/pdf",
@@ -272,7 +268,6 @@ const AppointmentsScreen = ({ navigation }) => {
     if (!selectedAppointment) return;
 
     try {
-      // Vérifier si on peut annuler (au moins 24h avant)
       const appointmentDate = selectedAppointment.date.toDate();
       const now = new Date();
       const hoursDiff = (appointmentDate - now) / (1000 * 60 * 60);
@@ -293,7 +288,6 @@ const AppointmentsScreen = ({ navigation }) => {
         { text: "OK" },
       ]);
 
-      // Recharger la liste
       loadAppointments();
     } catch (error) {
       console.error("Erreur annulation:", error);
@@ -307,13 +301,13 @@ const AppointmentsScreen = ({ navigation }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case "confirmed":
-        return "#4CAF50"; // Vert
+        return "#4CAF50"; 
       case "pending":
-        return "#FF9800"; // Orange
+        return "#FF9800"; 
       case "cancelled":
-        return "#F44336"; // Rouge
+        return "#F44336"; 
       case "completed":
-        return "#2196F3"; // Bleu
+        return "#2196F3"; 
       default:
         return "#666";
     }
@@ -502,7 +496,6 @@ const AppointmentsScreen = ({ navigation }) => {
           </View>
         )}
 
-        {/* Bouton pour prendre un nouveau rendez-vous */}
         <TouchableOpacity
           style={styles.newAppointmentButton}
           onPress={() => navigation.navigate("Services")}
@@ -512,7 +505,6 @@ const AppointmentsScreen = ({ navigation }) => {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Modal de confirmation d'annulation */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -769,7 +761,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 10,
   },
-  // Modal styles
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

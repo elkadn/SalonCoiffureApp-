@@ -22,8 +22,7 @@ const ProfilCapillaireScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // État pour gérer le modal actif
-  const [activeModal, setActiveModal] = useState(null); // null, 'typeCheveux', 'etatCheveux', etc.
+  const [activeModal, setActiveModal] = useState(null); 
   const [modalOptions, setModalOptions] = useState([]);
   const [modalTitle, setModalTitle] = useState("");
   const COULEURS_NATURELLES = [
@@ -43,17 +42,16 @@ const ProfilCapillaireScreen = ({ navigation, route }) => {
     "Gris/Sel et poivre",
     "Blanc",
   ];
-  // Données du formulaire selon le diagramme de classe
   const [formData, setFormData] = useState({
-    typeCheveux: "", // Normal, Sec, Gras, Mixte
-    etatCheveux: "", // Abimé, Normal, Sain
-    textureCheveux: "", // Raide, Ondulé, Bouclé, Frisé
-    longueurCheveux: "", // Court, Moyen, Long
+    typeCheveux: "",
+    etatCheveux: "", 
+    textureCheveux: "", 
+    longueurCheveux: "", 
     couleurNaturelle: "",
     allergies: "",
     traitementsActuels: "",
     produitsUtilises: "",
-    objectifs: "", // Coupe, Coloration, Soin, etc.
+    objectifs: "", 
     notesSupplementaires: "",
   });
 
@@ -104,7 +102,6 @@ const ProfilCapillaireScreen = ({ navigation, route }) => {
     }
   };
 
-  // Fonction pour ouvrir le modal
   const openModal = (field, options, title, allowCustom = false) => {
     setActiveModal(field);
     setModalOptions([
@@ -113,17 +110,14 @@ const ProfilCapillaireScreen = ({ navigation, route }) => {
     ]);
     setModalTitle(title);
   };
-  // Fonction pour fermer le modal
   const closeModal = () => {
     setActiveModal(null);
     setModalOptions([]);
     setModalTitle("");
   };
 
-  // Fonction pour sélectionner une option
   const selectOption = (option) => {
     if (option === "➕ Autre...") {
-      // Si l'utilisateur choisit "Autre", on ouvre un input
       closeModal();
       setTimeout(() => {
         Alert.prompt(
@@ -152,7 +146,6 @@ const ProfilCapillaireScreen = ({ navigation, route }) => {
     }
   };
 
-  // Fonction pour rendre un champ select
   const renderSelectField = (label, field, options, allowCustom = false) => {
     const fieldValue = formData[field];
     const displayValue = fieldValue || "Sélectionner...";
@@ -253,7 +246,7 @@ const ProfilCapillaireScreen = ({ navigation, route }) => {
             "Couleur naturelle",
             "couleurNaturelle",
             COULEURS_NATURELLES,
-            true // allowCustom
+            true 
           )}
         </View>
 
@@ -308,7 +301,6 @@ const ProfilCapillaireScreen = ({ navigation, route }) => {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Modal unique pour toutes les sélections */}
       <Modal
         visible={activeModal !== null}
         transparent={true}
@@ -364,7 +356,6 @@ const ProfilCapillaireScreen = ({ navigation, route }) => {
   );
 };
 
-// Les styles restent les mêmes
 const styles = StyleSheet.create({
   container: {
     flex: 1,
